@@ -284,7 +284,7 @@
     <footer class="bg-white border-t border-slate-200 py-5 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
             <p>Ma Wishlist LEGO personnelle — Synchronisation Supabase & Recherche Rebrickable.</p>
-            <p>Comparateurs : Avenue de la Brique, Brickmitri.com, Planet-Brick, Leboncoin & Vinted.</p>
+            <p>Comparateurs : Avenue de la Brique, Brickmitri.com, Planet-Brick, Leboncoin, Vinted & Dealabs.</p>
         </div>
     </footer>
 
@@ -342,9 +342,7 @@
                         </label>
                         <div id="bundle-builder-section" class="hidden space-y-2 pt-2 border-t border-indigo-200/70">
                             <p class="text-[11px] text-indigo-800">Sélectionne les sets de ta liste inclus dans ce lot (ou tape les numéros dans le champ N° de set) :</p>
-                            <div id="bundle-sets-checklist" class="max-h-36 overflow-y-auto bg-white rounded-lg border border-indigo-200 divide-y divide-slate-100 p-1">
-                                <!-- Injecté dynamiquement -->
-                            </div>
+                            <div id="bundle-sets-checklist" class="max-h-36 overflow-y-auto bg-white rounded-lg border border-indigo-200 divide-y divide-slate-100 p-1"></div>
                             <div class="flex justify-between items-center text-xs">
                                 <button type="button" onclick="autoFillBundleFromSelection()" class="text-indigo-700 hover:underline font-semibold">
                                     Remplir automatiquement N°, nom et prix cumulé
@@ -461,7 +459,7 @@
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-bold uppercase text-slate-700 flex items-center gap-1.5">
                                 <i data-lucide="shopping-bag" class="w-4 h-4 text-lego-blue"></i>
-                                Liens d'achat personnalisés (Leboncoin, Vinted, Amazon...)
+                                Liens d'achat personnalisés (Leboncoin, Vinted, Dealabs, Amazon...)
                             </label>
                             <button type="button" onclick="addCustomLinkRow()" class="text-xs font-semibold bg-white hover:bg-slate-100 text-lego-blue border border-slate-300 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Ajouter un lien
@@ -574,7 +572,7 @@
         </div>
     </div>
 
-    <!-- 4. MODALE COMPARATEUR RAPIDE (AVEC LEBONCOIN & VINTED) -->
+    <!-- 4. MODALE COMPARATEUR RAPIDE (AVEC LEBONCOIN, VINTED & DEALABS) -->
     <div id="comparator-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden my-auto">
             <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
@@ -618,6 +616,17 @@
                             <p class="text-xs text-emerald-800">Recherche produit directe sur planet-brick.com</p>
                         </div>
                         <i data-lucide="external-link" class="w-4 h-4 text-emerald-800 shrink-0"></i>
+                    </a>
+                    <!-- CASE DEALABS -->
+                    <a id="qcomp-dealabs" href="https://www.dealabs.com/search?q=lego" target="_blank" rel="noopener" class="flex items-center justify-between p-3 rounded-xl border border-sky-300 bg-sky-50/80 hover:bg-sky-100 transition">
+                        <div class="flex items-center gap-2.5">
+                            <img src="https://www.google.com/s2/favicons?domain=dealabs.com&sz=32" alt="" class="w-5 h-5 rounded-sm shrink-0">
+                            <div>
+                                <p class="font-bold text-sm text-sky-950">Dealabs</p>
+                                <p class="text-xs text-sky-800">N'oubliez pas de regarder aussi sur Dealabs</p>
+                            </div>
+                        </div>
+                        <i data-lucide="external-link" class="w-4 h-4 text-sky-800 shrink-0"></i>
                     </a>
                     <!-- CASE LEBONCOIN -->
                     <a id="qcomp-lbc" href="https://www.leboncoin.fr/recherche?text=lego" target="_blank" rel="noopener" class="flex items-center justify-between p-3 rounded-xl border border-orange-300 bg-orange-50/80 hover:bg-orange-100 transition">
@@ -746,17 +755,14 @@
             const rel = String(set.releaseDate || '').trim();
             const note = String(set.note || '').toLowerCase();
 
-            // Si mention explicite "sort le ..." dans la note
             if (note.includes('sort le')) return true;
 
             if (rel) {
-                // Recherche d'une année à 4 chiffres (ex: 2027)
                 const yearMatch = rel.match(/\b(20\d{2})\b/);
                 if (yearMatch) {
                     const y = parseInt(yearMatch[1], 10);
                     if (y > currentYear) return true;
                 }
-                // Si date ISO YYYY-MM-DD
                 if (/^\d{4}-\d{2}-\d{2}$/.test(rel)) {
                     const d = new Date(rel);
                     if (!isNaN(d.getTime()) && d > now) return true;
@@ -1010,7 +1016,7 @@
         }
 
         // =========================================================================
-        // LIENS COMPARATEURS DE PRIX, LEBONCOIN, VINTED & FAVICON
+        // LIENS COMPARATEURS DE PRIX, DEALABS, LEBONCOIN, VINTED & FAVICON
         // =========================================================================
         function slugifyLegoName(text) {
             return String(text || '')
@@ -1032,6 +1038,9 @@
                 ? `https://brickmitri.com/comparateur-lego/${slug}-${cleanNum}/`
                 : `https://brickmitri.com/?s=${encodedNum}`;
             const planetUrl = `https://planet-brick.com/?s=${encodedNum}&post_type=product`;
+            const dealabsUrl = cleanNum
+                ? `https://www.dealabs.com/search?q=${encodeURIComponent('lego ' + cleanNum)}`
+                : `https://www.dealabs.com/search?q=lego`;
             const leboncoinUrl = cleanNum
                 ? `https://www.leboncoin.fr/recherche?text=${encodeURIComponent('lego ' + cleanNum)}`
                 : `https://www.leboncoin.fr/recherche?text=lego`;
@@ -1043,6 +1052,7 @@
                 avenue: avenueUrl,
                 brickmitri: brickmitriUrl,
                 planet: planetUrl,
+                dealabs: dealabsUrl,
                 leboncoin: leboncoinUrl,
                 vinted: vintedUrl
             };
@@ -1086,12 +1096,14 @@
                 avenue: 'https://www.avenuedelabrique.com',
                 brickmitri: 'https://brickmitri.com',
                 planet: 'https://planet-brick.com',
+                dealabs: 'https://www.dealabs.com/search?q=lego',
                 leboncoin: 'https://www.leboncoin.fr/recherche?text=lego',
                 vinted: 'https://www.vinted.fr/catalog?search_text=lego'
             };
             document.getElementById('qcomp-adlb').href = urls.avenue;
             document.getElementById('qcomp-bm').href = urls.brickmitri;
             document.getElementById('qcomp-pb').href = urls.planet;
+            document.getElementById('qcomp-dealabs').href = urls.dealabs;
             document.getElementById('qcomp-lbc').href = urls.leboncoin;
             document.getElementById('qcomp-vinted').href = urls.vinted;
         }
@@ -1616,7 +1628,7 @@
                                 <div>
                                     <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center justify-between">
                                         <span>Comparer les prix :</span>
-                                        <button onclick="openComparatorHelper('${escapeHTML(set.number)}', '${escapeHTML(set.name).replace(/'/g, "\\'")}')" class="text-lego-blue hover:underline lowercase font-medium">+ Leboncoin / Vinted</button>
+                                        <button onclick="openComparatorHelper('${escapeHTML(set.number)}', '${escapeHTML(set.name).replace(/'/g, "\\'")}')" class="text-lego-blue hover:underline lowercase font-medium">+ Dealabs / LBC / Vinted</button>
                                     </p>
                                     <div class="grid grid-cols-3 gap-1.5">
                                         <a href="${urls.avenue}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-amber-100/80 hover:bg-amber-200 text-amber-950 font-semibold rounded-lg text-[11px] transition truncate" title="Rechercher sur Avenue de la Brique">
