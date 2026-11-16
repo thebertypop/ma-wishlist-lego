@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ma Wishlist LEGO | Noël & Anniversaire</title>
-    <!-- Hébergement conseillé : GitHub Pages. Google Sites peut intégrer l’URL GitHub Pages. -->
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter & Fredoka (pour une touche ludique LEGO) -->
+    <!-- Google Fonts: Inter & Fredoka -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -38,7 +37,6 @@
         }
     </script>
     <style>
-        /* Texture subtil de tenons LEGO en arrière-plan du header */
         .lego-studs-bg {
             background-color: #FFCF00;
             background-image: radial-gradient(rgba(215, 165, 0, 0.35) 22%, transparent 23%),
@@ -46,33 +44,21 @@
             background-size: 36px 36px;
             background-position: 0 0, 1px 1px;
         }
-        /* Transitions fluides */
         .card-hover {
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
         }
         .card-hover:hover {
             transform: translateY(-4px);
         }
-        /* Scrollbar personnalisée */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- NOTIFICATION TOAST (Remplace alert) -->
+    <!-- NOTIFICATION TOAST -->
     <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- BANNIÈRE MODE FAMILLE / PARTAGE URL -->
@@ -109,14 +95,13 @@
                             </button>
                         </div>
                         <p class="text-slate-800/80 text-xs sm:text-sm font-medium">
-                            Idées cadeaux Noël & Anniversaire • Comparateurs intégrés
+                            Idées cadeaux Noël & Anniversaire • Comparateurs & Rebrickable intégrés
                         </p>
                     </div>
                 </div>
 
                 <!-- Actions Principales & Bascule Mode -->
                 <div class="flex flex-wrap items-center gap-2.5">
-                    <!-- Bascule Mode Édition / Mode Famille -->
                     <div id="mode-switcher" class="bg-white/90 backdrop-blur p-1 rounded-xl shadow-sm border border-amber-300 flex items-center">
                         <button id="mode-edit-btn" onclick="setMode('edit')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition">
                             <i data-lucide="wrench" class="w-4 h-4"></i>
@@ -128,13 +113,11 @@
                         </button>
                     </div>
 
-                    <!-- Bouton Partager -->
                     <button id="share-btn" onclick="openShareModal()" class="bg-lego-blue hover:bg-lego-blueHover text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 text-sm">
                         <i data-lucide="share-2" class="w-4 h-4"></i>
                         <span>Partager</span>
                     </button>
 
-                    <!-- Bouton Ajouter un Set (Visible en mode édition) -->
                     <button id="add-set-btn" onclick="openSetModal()" class="bg-lego-red hover:bg-lego-redHover text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 text-sm">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                         <span>Ajouter un set</span>
@@ -178,11 +161,11 @@
     <!-- CONTENU PRINCIPAL -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- BARRE D'ALERTE EXEMPLES (Si données démo actives) -->
+        <!-- BARRE D'ALERTE EXEMPLES -->
         <div id="demo-banner" class="hidden mb-6 bg-amber-50 border border-amber-300 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div class="flex items-center gap-2.5 text-sm text-amber-900">
                 <i data-lucide="sparkles" class="w-5 h-5 text-amber-600 shrink-0"></i>
-                <span>Votre liste contient actuellement <strong>3 sets d'exemple</strong> pour vous montrer le fonctionnement.</span>
+                <span>Votre liste contient actuellement des <strong>sets d'exemple</strong>.</span>
             </div>
             <button onclick="clearDemoData()" class="text-xs font-semibold bg-amber-200/80 hover:bg-amber-300 text-amber-950 px-3 py-1.5 rounded-lg transition shrink-0">
                 Vider les exemples
@@ -273,9 +256,7 @@
         </section>
 
         <!-- GRILLE DES SETS LEGO -->
-        <div id="sets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Les cartes sont injectées ici par JavaScript -->
-        </div>
+        <div id="sets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
         <!-- ÉTAT VIDE -->
         <div id="empty-state" class="hidden bg-white rounded-2xl border-2 border-dashed border-slate-300 p-12 text-center my-6">
@@ -300,8 +281,8 @@
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 py-5 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-            <p>Ma Wishlist LEGO personnelle — Données stockées localement dans votre navigateur.</p>
-            <p>Liens comparateurs : Avenue de la Brique, Brickmitri & Planet-Brick.</p>
+            <p>Ma Wishlist LEGO personnelle — Synchronisation Supabase & Recherche Rebrickable.</p>
+            <p>Comparateurs : Avenue de la Brique, Brickmitri.com & Planet-Brick.</p>
         </div>
     </footer>
 
@@ -309,9 +290,9 @@
     <!-- MODALES                                                               -->
     <!-- ===================================================================== -->
 
-    <!-- 1. MODALE AJOUT / ÉDITION D'UN SET -->
+    <!-- 1. MODALE AJOUT / ÉDITION D'UN SET (AVEC RECHERCHE REBRICKABLE) -->
     <div id="set-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden my-auto animate-fade-in">
+        <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden my-auto">
             <div class="bg-lego-yellow px-6 py-4 flex items-center justify-between border-b border-amber-300">
                 <h2 id="set-modal-title" class="font-display text-xl font-bold text-slate-900 flex items-center gap-2">
                     <i data-lucide="plus-square" class="w-5 h-5 text-lego-red"></i>
@@ -322,129 +303,155 @@
                 </button>
             </div>
 
-            <form id="set-form" onsubmit="saveSet(event)" class="p-6 space-y-4">
-                <input type="hidden" id="set-id">
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">N° du set *</label>
-                        <input type="text" id="set-number" required placeholder="ex: 10316" oninput="updateLiveComparatorLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nom du set *</label>
-                        <input type="text" id="set-name" required placeholder="ex: Le Seigneur des Anneaux : Fondcombe" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                    </div>
-                </div>
-
-                <!-- Aperçu rapide des comparateurs pendant l'ajout -->
-                <div id="live-comparator-bar" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <span class="text-slate-600 font-medium">Vérifier le prix actuel :</span>
-                    <div class="flex flex-wrap gap-1.5">
-                        <a id="live-link-adlb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-lg transition">Avenue de la Brique ↗</a>
-                        <a id="live-link-bm" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-blue-100 hover:bg-blue-200 text-blue-900 font-semibold rounded-lg transition">Brickmitri ↗</a>
-                        <a id="live-link-pb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-semibold rounded-lg transition">Planet-Brick ↗</a>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Gamme / Thème</label>
-                        <select id="set-theme" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                            <option value="Star Wars">Star Wars</option>
-                        <option value="Batman">Batman</option>
-                        <option value="DC">DC</option>
-                        <option value="Marvel">Marvel</option>
-                        <option value="Simpsons">Simpsons</option>
-                        <option value="Scooby-Doo">Scooby-Doo</option>
-                        <option value="One Piece">One Piece</option>
-                        <option value="Friends">Friends</option>
-                            <option value="Icons">Icons</option>
-                            <option value="Technic">Technic</option>
-                            <option value="Harry Potter">Harry Potter</option>
-                            <option value="Ideas">Ideas</option>
-                            <option value="Architecture">Architecture</option>
-                            <option value="City">City</option>
-                            <option value="Creator">Creator 3-en-1</option>
-                            <option value="Speed Champions">Speed Champions</option>
-                            <option value="Botanical">Botanical Collection</option>
-                            <option value="Autre">Autre</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Prix estimé (€)</label>
-                        <input type="number" id="set-price" step="0.01" min="0" placeholder="ex: 499.99" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Priorité</label>
-                        <select id="set-priority" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                            <option value="high">🔥 Coup de cœur (Haute)</option>
-                            <option value="medium" selected>⭐ Moyenne</option>
-                            <option value="low">💡 Idée bonus</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Occasion</label>
-                        <select id="set-occasion" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                            <option value="Les deux">✨ Noël & Anniversaire</option>
-                            <option value="Noël">🎄 Noël</option>
-                            <option value="Anniversaire">🎂 Anniversaire</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                    <label class="flex items-center gap-3 p-3 rounded-xl border border-orange-200 bg-orange-50 cursor-pointer hover:bg-orange-100 transition">
-                        <input type="checkbox" id="set-retiring-soon" class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500">
-                        <span class="flex flex-col">
-                            <span class="text-sm font-bold text-orange-900">⏳ Bientôt retiré</span>
-                            <span class="text-xs text-orange-700">Alerte sur la carte</span>
+            <div class="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+                <!-- BARRE DE RECHERCHE AUTOMATIQUE REBRICKABLE -->
+                <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3.5 space-y-2.5">
+                    <label class="block text-xs font-bold uppercase text-lego-blue flex items-center justify-between">
+                        <span class="flex items-center gap-1.5">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            Recherche automatique (Rebrickable)
                         </span>
+                        <span id="rb-status" class="text-[11px] font-normal text-slate-500">N° ou nom anglais</span>
                     </label>
-                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sky-200 bg-sky-50 cursor-pointer hover:bg-sky-100 transition">
-                        <input type="checkbox" id="set-new-release" class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500">
-                        <span class="flex flex-col">
-                            <span class="text-sm font-bold text-sky-900">✨ Nouveauté</span>
-                            <span class="text-xs text-sky-700">Set récemment sorti</span>
-                        </span>
-                    </label>
-                    <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-300 bg-slate-100 cursor-pointer hover:bg-slate-200 transition">
-                        <input type="checkbox" id="set-retired" class="w-4 h-4 rounded text-slate-600 focus:ring-slate-500">
-                        <span class="flex flex-col">
-                            <span class="text-sm font-bold text-slate-800">📦 Retiré du catalogue</span>
-                            <span class="text-xs text-slate-600">Set discontinué par LEGO</span>
-                        </span>
-                    </label>
-                    <label class="flex items-center gap-3 p-3 rounded-xl border border-violet-200 bg-violet-50 cursor-pointer hover:bg-violet-100 transition">
-                        <input type="checkbox" id="set-exclusive" class="w-4 h-4 rounded text-violet-600 focus:ring-violet-500">
-                        <span class="flex flex-col">
-                            <span class="text-sm font-bold text-violet-900">💎 Exclusivité</span>
-                            <span class="text-xs text-violet-700">Set exclusif / édition spéciale</span>
-                        </span>
-                    </label>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" id="rb-search-input" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchRebrickable();}" placeholder="Ex: 76341, Simpsons, Arkham Asylum..." class="w-full pl-3 pr-8 py-2 bg-white border border-blue-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2"></i>
+                        </div>
+                        <button type="button" onclick="searchRebrickable()" class="px-4 py-2 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl text-xs sm:text-sm transition shrink-0">
+                            Chercher
+                        </button>
+                    </div>
+                    <!-- Liste des résultats Rebrickable -->
+                    <div id="rb-results" class="hidden max-h-56 overflow-y-auto divide-y divide-slate-100 bg-white rounded-xl border border-blue-200 shadow-inner"></div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">URL de l'image (Optionnel)</label>
-                    <input type="url" id="set-image" placeholder="https://... (laisser vide pour vignette automatique)" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                </div>
+                <!-- FORMULAIRE DU SET -->
+                <form id="set-form" onsubmit="saveSet(event)" class="space-y-4">
+                    <input type="hidden" id="set-id">
 
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Note personnelle / Astuce prix</label>
-                    <textarea id="set-note" rows="2" placeholder="ex: Souvent en promo chez Amazon ou Leclerc autour de 420 €..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none"></textarea>
-                </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">N° du set *</label>
+                            <input type="text" id="set-number" required placeholder="ex: 76341" oninput="updateLiveComparatorLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nom du set (FR ou EN) *</label>
+                            <input type="text" id="set-name" required placeholder="ex: Groot en tenue de Ravageur" oninput="updateLiveComparatorLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                        </div>
+                    </div>
 
-                <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeModal('set-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition">
-                        Annuler
-                    </button>
-                    <button type="submit" class="px-5 py-2 bg-lego-red hover:bg-lego-redHover text-white font-semibold rounded-xl text-sm shadow-sm transition">
-                        Enregistrer le set
-                    </button>
-                </div>
-            </form>
+                    <!-- Aperçu rapide des comparateurs pendant l'ajout -->
+                    <div id="live-comparator-bar" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span class="text-slate-600 font-medium">Tester les liens :</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <a id="live-link-adlb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-lg transition">Avenue de la Brique ↗</a>
+                            <a id="live-link-bm" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-blue-100 hover:bg-blue-200 text-blue-900 font-semibold rounded-lg transition">Brickmitri ↗</a>
+                            <a id="live-link-pb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-semibold rounded-lg transition">Planet-Brick ↗</a>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Gamme / Thème</label>
+                            <select id="set-theme" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                                <option value="Star Wars">Star Wars</option>
+                                <option value="Batman">Batman</option>
+                                <option value="DC">DC</option>
+                                <option value="Marvel">Marvel</option>
+                                <option value="Simpsons">Simpsons</option>
+                                <option value="Scooby-Doo">Scooby-Doo</option>
+                                <option value="One Piece">One Piece</option>
+                                <option value="Friends">Friends</option>
+                                <option value="Icons">Icons</option>
+                                <option value="Technic">Technic</option>
+                                <option value="Harry Potter">Harry Potter</option>
+                                <option value="Ideas">Ideas</option>
+                                <option value="Architecture">Architecture</option>
+                                <option value="City">City</option>
+                                <option value="Creator">Creator 3-en-1</option>
+                                <option value="Speed Champions">Speed Champions</option>
+                                <option value="Botanical">Botanical Collection</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Prix estimé (€)</label>
+                            <input type="number" id="set-price" step="0.01" min="0" placeholder="ex: 59.99" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- DATES DE SORTIE ET DE RETRAIT -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Date de sortie</label>
+                            <input type="text" id="set-release-date" placeholder="ex: Août 2025 ou 2025" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Date de retrait prévue</label>
+                            <input type="text" id="set-retire-date" placeholder="ex: Déc. 2026 ou Retiré" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Priorité</label>
+                            <select id="set-priority" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                                <option value="high">🔥 Coup de cœur (Haute)</option>
+                                <option value="medium" selected>⭐ Moyenne</option>
+                                <option value="low">💡 Idée bonus</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Occasion</label>
+                            <select id="set-occasion" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                                <option value="Les deux">✨ Noël & Anniversaire</option>
+                                <option value="Noël">🎄 Noël</option>
+                                <option value="Anniversaire">🎂 Anniversaire</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- BADGES / STATUTS -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <label class="flex items-center gap-2 p-2.5 rounded-xl border border-orange-200 bg-orange-50 cursor-pointer hover:bg-orange-100 transition">
+                            <input type="checkbox" id="set-retiring-soon" class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500">
+                            <span class="text-xs font-bold text-orange-900">⏳ Bientôt retiré</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2.5 rounded-xl border border-sky-200 bg-sky-50 cursor-pointer hover:bg-sky-100 transition">
+                            <input type="checkbox" id="set-new-release" class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500">
+                            <span class="text-xs font-bold text-sky-900">✨ Nouveauté</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-300 bg-slate-100 cursor-pointer hover:bg-slate-200 transition">
+                            <input type="checkbox" id="set-retired" class="w-4 h-4 rounded text-slate-600 focus:ring-slate-500">
+                            <span class="text-xs font-bold text-slate-800">📦 Retiré</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2.5 rounded-xl border border-violet-200 bg-violet-50 cursor-pointer hover:bg-violet-100 transition">
+                            <input type="checkbox" id="set-exclusive" class="w-4 h-4 rounded text-violet-600 focus:ring-violet-500">
+                            <span class="text-xs font-bold text-violet-900">💎 Exclusivité</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">URL de l'image</label>
+                        <input type="url" id="set-image" placeholder="Rempli automatiquement via Rebrickable ou URL manuelle" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Note personnelle / Astuce prix</label>
+                        <textarea id="set-note" rows="2" placeholder="ex: Trouvable à 35€ en promo..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none"></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+                        <button type="button" onclick="closeModal('set-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition">
+                            Annuler
+                        </button>
+                        <button type="submit" class="px-5 py-2 bg-lego-red hover:bg-lego-redHover text-white font-semibold rounded-xl text-sm shadow-sm transition">
+                            Enregistrer le set
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -478,7 +485,7 @@
         </div>
     </div>
 
-    <!-- 3. MODALE PARTAGE (LIEN PERMANENT & TEXTE WHATSAPP/SMS) -->
+    <!-- 3. MODALE PARTAGE -->
     <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden my-auto">
             <div class="bg-lego-blue text-white px-6 py-4 flex items-center justify-between">
@@ -492,27 +499,25 @@
             </div>
 
             <div class="p-6 space-y-6">
-                <!-- Option A : Lien interactif encodé -->
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
                         <label class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                             <i data-lucide="link" class="w-4 h-4 text-lego-blue"></i>
-                            <span>1. Lien interactif (Sans compte ni serveur)</span>
+                            <span>1. Lien direct Mode Famille</span>
                         </label>
-                        <span class="text-[11px] bg-blue-50 text-lego-blue font-semibold px-2 py-0.5 rounded-full">Recommandé</span>
+                        <span class="text-[11px] bg-blue-50 text-lego-blue font-semibold px-2 py-0.5 rounded-full">Synchronisé Supabase</span>
                     </div>
                     <p class="text-xs text-slate-500 mb-2">
-                        Toute votre liste est encodée directement dans ce lien. Votre famille ouvrira la page directement en <strong>Mode Famille</strong> avec les liens comparateurs.
+                        Ce lien ouvre directement la liste en <strong>Mode Famille</strong> (sans boutons d'édition) avec les réservations en temps réel.
                     </p>
                     <div class="flex gap-2">
                         <input type="text" id="share-url-input" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono text-slate-600 focus:outline-none">
-                        <button onclick="copyToClipboard('share-url-input', 'Lien interactif copié !')" class="px-4 py-2 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl text-xs shrink-0 flex items-center gap-1.5 transition">
+                        <button onclick="copyToClipboard('share-url-input', 'Lien famille copié !')" class="px-4 py-2 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl text-xs shrink-0 flex items-center gap-1.5 transition">
                             <i data-lucide="copy" class="w-4 h-4"></i> Copier
                         </button>
                     </div>
                 </div>
 
-                <!-- Option B : Résumé texte WhatsApp / SMS / Email -->
                 <div class="pt-4 border-t border-slate-100">
                     <div class="flex items-center justify-between mb-1.5">
                         <label class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
@@ -522,7 +527,7 @@
                     </div>
                     <textarea id="share-text-area" rows="7" readonly class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs font-sans text-slate-700 focus:outline-none"></textarea>
                     <div class="flex justify-end mt-2">
-                        <button onclick="copyToClipboard('share-text-area', 'Message copié pour WhatsApp / SMS !')" class="px-4 py-2 bg-lego-green hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs flex items-center gap-1.5 transition">
+                        <button onclick="copyToClipboard('share-text-area', 'Message copié !')" class="px-4 py-2 bg-lego-green hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs flex items-center gap-1.5 transition">
                             <i data-lucide="copy" class="w-4 h-4"></i> Copier le message
                         </button>
                     </div>
@@ -531,7 +536,7 @@
         </div>
     </div>
 
-    <!-- 4. MODALE COMPARATEUR RAPIDE & EXPLICATION -->
+    <!-- 4. MODALE COMPARATEUR RAPIDE -->
     <div id="comparator-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden">
             <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
@@ -544,25 +549,28 @@
                 </button>
             </div>
             <div class="p-6 space-y-4">
-                <p class="text-xs text-slate-600 bg-amber-50 border border-amber-200 p-3 rounded-xl">
-                    <strong>Note technique :</strong> Les sites comparateurs bloquent l'affichage direct dans une fenêtre intégrée (sécurité <em>X-Frame-Options</em>). Utilisez ces boutons d'accès direct qui lancent automatiquement la recherche du numéro de set.
-                </p>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Numéro de set à comparer</label>
-                    <input type="text" id="quick-comp-number" placeholder="ex: 75192" oninput="updateQuickCompModalLinks()" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-base font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">N° de set</label>
+                        <input type="text" id="quick-comp-number" placeholder="ex: 76341" oninput="updateQuickCompModalLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nom du set (pour slug Brickmitri)</label>
+                        <input type="text" id="quick-comp-name" placeholder="ex: Groot en tenue de Ravageur" oninput="updateQuickCompModalLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 gap-2.5 pt-2">
                     <a id="qcomp-adlb" href="https://www.avenuedelabrique.com" target="_blank" rel="noopener" class="flex items-center justify-between p-3.5 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100 transition">
                         <div>
                             <p class="font-bold text-sm text-amber-950">Avenue de la Brique</p>
-                            <p class="text-xs text-amber-800">Comparateur historique & historique des prix</p>
+                            <p class="text-xs text-amber-800">Comparateur & historique des prix</p>
                         </div>
                         <i data-lucide="external-link" class="w-4 h-4 text-amber-800"></i>
                     </a>
-                    <a id="qcomp-bm" href="https://www.brickmitri.fr" target="_blank" rel="noopener" class="flex items-center justify-between p-3.5 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 transition">
+                    <a id="qcomp-bm" href="https://brickmitri.com" target="_blank" rel="noopener" class="flex items-center justify-between p-3.5 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 transition">
                         <div>
-                            <p class="font-bold text-sm text-blue-950">Brickmitri</p>
-                            <p class="text-xs text-blue-800">Suivi des stocks et alertes promos LEGO</p>
+                            <p class="font-bold text-sm text-blue-950">Brickmitri.com</p>
+                            <p class="text-xs text-blue-800">Fiche comparateur directe (/comparateur-lego/...)</p>
                         </div>
                         <i data-lucide="external-link" class="w-4 h-4 text-blue-800"></i>
                     </a>
@@ -589,7 +597,7 @@
             </div>
             <div class="p-6 space-y-4 text-sm">
                 <p class="text-slate-600 text-xs">
-                    Votre liste est synchronisée en ligne avec la famille. Vous pouvez aussi télécharger un fichier de sauvegarde sur votre appareil.
+                    Votre liste est synchronisée en ligne avec la famille. Vous pouvez aussi télécharger ou importer un fichier JSON.
                 </p>
                 <button onclick="exportJSON()" class="w-full py-2.5 px-4 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition">
                     <i data-lucide="download" class="w-4 h-4"></i> Télécharger ma liste (.json)
@@ -610,7 +618,7 @@
                 <button onclick="closeModal('title-modal')" class="p-1 bg-white/60 rounded-lg"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <form onsubmit="saveListTitle(event)" class="p-5 space-y-4">
-                <input type="text" id="list-title-input" required placeholder="ex: Liste LEGO de Thomas - Noël 2026" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                <input type="text" id="list-title-input" required placeholder="ex: Liste LEGO - Noël 2026" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeModal('title-modal')" class="px-3 py-1.5 bg-slate-100 rounded-xl text-sm">Annuler</button>
                     <button type="submit" class="px-4 py-1.5 bg-lego-blue text-white font-semibold rounded-xl text-sm">Valider</button>
@@ -619,73 +627,255 @@
         </div>
     </div>
 
-    <!-- Supabase : base de données et synchronisation familiale -->
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- SCRIPT APPLICATIF -->
     <script>
         // =========================================================================
-        // ÉTAT DE L'APPLICATION & DONNÉES INITIALES
+        // CONFIGURATION & ÉTAT
         // =========================================================================
         const STORAGE_KEY = 'lego_wishlist_data_v1';
+        const REBRICKABLE_API_KEY = '74ad3eca8aac17fd97effc44e60f4599';
         const SUPABASE_URL = 'https://nlqdbdzrzdexahexpobf.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_grCrSREgmV_YZgiOgqZ7PA_543o1pME';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let currentUserId = null;
         let realtimeChannel = null;
         let cloudReady = false;
+        let rbThemesCache = null;
+
         let appState = {
             title: 'Ma Wishlist LEGO',
             sets: [],
             isDemo: false
         };
-        // Le lien de partage ajoute ?mode=family : il ouvre une vue famille verrouillée.
+
         const isFamilyShareLink = new URLSearchParams(window.location.search).get('mode') === 'family';
-        let currentMode = isFamilyShareLink ? 'family' : 'edit'; // 'edit' | 'family'
+        let currentMode = isFamilyShareLink ? 'family' : 'edit';
         let isViewingSharedUrl = isFamilyShareLink;
 
-        // Sets d'exemple au premier lancement
         const DEFAULT_DEMO_SETS = [
             {
                 id: 'demo-1',
-                number: '10316',
-                name: 'Le Seigneur des Anneaux : Fondcombe',
-                theme: 'Icons',
-                price: 499.99,
-                priority: 'high',
-                occasion: 'Noël',
-                image: '',
-                note: 'Le set ultime ! Souvent en promo autour de 420-450 € sur Amazon ou Fnac.',
-                reservedBy: ''
-            },
-            {
-                id: 'demo-2',
-                number: '75355',
-                name: 'X-Wing Starfighter (UCS)',
-                theme: 'Star Wars',
-                price: 239.99,
+                number: '76341',
+                name: 'Groot en tenue de Ravageur',
+                theme: 'Marvel',
+                price: 60,
+                releaseDate: '2025',
+                retireDate: '',
                 priority: 'medium',
-                occasion: 'Anniversaire',
-                image: '',
-                note: 'Vérifier les offres sur Avenue de la Brique avant achat.',
-                reservedBy: ''
-            },
-            {
-                id: 'demo-3',
-                number: '21333',
-                name: 'Vincent van Gogh - La Nuit étoilée',
-                theme: 'Ideas',
-                price: 169.99,
-                priority: 'low',
                 occasion: 'Les deux',
-                image: '',
-                note: 'Superbe à accrocher au mur.',
-                reservedBy: 'Mamie'
+                image: 'https://www.lego.com/cdn/cs/set/assets/bltfdc3dfd99aac9d44/76341_Prod.png?width=1400',
+                note: 'Trouvable à 35€',
+                reservedBy: ''
             }
         ];
 
         // =========================================================================
-        // INITIALISATION
+        // REBRICKABLE API (RECHERCHE AUTOMATIQUE)
+        // =========================================================================
+        async function loadRebrickableThemes() {
+            if (rbThemesCache) return rbThemesCache;
+            try {
+                const res = await fetch(`https://rebrickable.com/api/v3/lego/themes/?page_size=1000`, {
+                    headers: { 'Authorization': `key ${REBRICKABLE_API_KEY}` }
+                });
+                if (!res.ok) return {};
+                const data = await res.json();
+                rbThemesCache = {};
+                (data.results || []).forEach(t => {
+                    rbThemesCache[t.id] = t.name;
+                });
+                return rbThemesCache;
+            } catch (e) {
+                console.warn('Erreur chargement thèmes Rebrickable:', e);
+                return {};
+            }
+        }
+
+        function mapRebrickableTheme(rbThemeName, setName = '') {
+            const combined = `${rbThemeName || ''} ${setName || ''}`.toLowerCase();
+            if (combined.includes('simpson')) return 'Simpsons';
+            if (combined.includes('scooby')) return 'Scooby-Doo';
+            if (combined.includes('one piece')) return 'One Piece';
+            if (combined.includes('batman')) return 'Batman';
+            if (combined.includes('dc') || combined.includes('superman') || combined.includes('justice league')) return 'DC';
+            if (combined.includes('marvel') || combined.includes('avengers') || combined.includes('spider-man') || combined.includes('groot')) return 'Marvel';
+            if (combined.includes('star wars')) return 'Star Wars';
+            if (combined.includes('friends')) return 'Friends';
+            if (combined.includes('harry potter')) return 'Harry Potter';
+            if (combined.includes('technic')) return 'Technic';
+            if (combined.includes('ideas')) return 'Ideas';
+            if (combined.includes('architecture')) return 'Architecture';
+            if (combined.includes('speed champions')) return 'Speed Champions';
+            if (combined.includes('botanical')) return 'Botanical';
+            if (combined.includes('creator')) return 'Creator';
+            if (combined.includes('city')) return 'City';
+            if (combined.includes('icons')) return 'Icons';
+            return 'Autre';
+        }
+
+        async function searchRebrickable() {
+            const query = document.getElementById('rb-search-input').value.trim();
+            const resultsBox = document.getElementById('rb-results');
+            const statusEl = document.getElementById('rb-status');
+
+            if (!query) {
+                showToast('Entre un numéro de set ou un mot-clé.', 'info');
+                return;
+            }
+
+            statusEl.textContent = 'Recherche en cours...';
+            resultsBox.classList.remove('hidden');
+            resultsBox.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Interrogation de Rebrickable...</div>`;
+
+            try {
+                const themesMap = await loadRebrickableThemes();
+                const url = `https://rebrickable.com/api/v3/lego/sets/?search=${encodeURIComponent(query)}&page_size=12`;
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `key ${REBRICKABLE_API_KEY}` }
+                });
+
+                if (!response.ok) throw new Error(`Erreur API (${response.status})`);
+                const data = await response.json();
+                const sets = data.results || [];
+
+                if (sets.length === 0) {
+                    statusEl.textContent = '0 résultat';
+                    resultsBox.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Aucun set trouvé pour "${escapeHTML(query)}".</div>`;
+                    return;
+                }
+
+                statusEl.textContent = `${sets.length} résultat(s)`;
+                resultsBox.innerHTML = sets.map((s, idx) => {
+                    const cleanNum = String(s.set_num).replace(/-1$/, '');
+                    const themeName = themesMap[s.theme_id] || 'LEGO';
+                    const img = s.set_img_url || '';
+                    return `
+                        <button type="button" onclick='selectRebrickableSet(${JSON.stringify({
+                            number: cleanNum,
+                            name: s.name,
+                            year: s.year,
+                            image: img,
+                            rbTheme: themeName,
+                            parts: s.num_parts
+                        }).replace(/'/g, "&#39;")})' class="w-full text-left p-2.5 hover:bg-blue-50 transition flex items-center gap-3">
+                            <img src="${escapeHTML(img)}" onerror="this.style.display='none'" class="w-12 h-12 object-contain bg-white rounded-lg border border-slate-200 p-1 shrink-0">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-mono text-xs font-bold bg-slate-900 text-white px-1.5 py-0.5 rounded">#${escapeHTML(cleanNum)}</span>
+                                    <span class="text-[11px] font-semibold text-lego-blue truncate">${escapeHTML(themeName)}</span>
+                                    <span class="text-[11px] text-slate-400">• ${escapeHTML(s.year)}</span>
+                                </div>
+                                <p class="text-xs font-bold text-slate-800 truncate mt-0.5">${escapeHTML(s.name)}</p>
+                                <p class="text-[11px] text-slate-500">${s.num_parts} pièces</p>
+                            </div>
+                            <span class="text-xs font-semibold text-lego-blue shrink-0">Choisir →</span>
+                        </button>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = 'Erreur';
+                resultsBox.innerHTML = `<div class="p-3 text-center text-xs text-red-600">Impossible de contacter Rebrickable : ${escapeHTML(err.message)}</div>`;
+            }
+        }
+
+        function selectRebrickableSet(item) {
+            document.getElementById('set-number').value = item.number;
+            document.getElementById('set-name').value = item.name;
+            if (item.image) document.getElementById('set-image').value = item.image;
+            if (item.year) document.getElementById('set-release-date').value = String(item.year);
+
+            const mappedTheme = mapRebrickableTheme(item.rbTheme, item.name);
+            document.getElementById('set-theme').value = mappedTheme;
+
+            // Détecter automatiquement si ancien set (sorti il y a plus de 3 ans)
+            const currentYear = new Date().getFullYear();
+            if (item.year && Number(item.year) <= currentYear - 3) {
+                document.getElementById('set-retired').checked = true;
+            }
+
+            document.getElementById('rb-results').classList.add('hidden');
+            updateLiveComparatorLinks();
+            showToast(`Set #${item.number} importé depuis Rebrickable !`, 'success');
+        }
+
+        // =========================================================================
+        // LIENS COMPARATEURS DE PRIX (CORRIGÉS)
+        // =========================================================================
+        function slugifyLegoName(text) {
+            return String(text || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // retire les accents
+                .replace(/[™®©]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        function getComparatorUrls(setNumber, setName = '') {
+            const cleanNum = String(setNumber || '').trim();
+            const encodedNum = encodeURIComponent(cleanNum);
+            const slug = slugifyLegoName(setName);
+
+            // Brickmitri.com utilise le format : https://brickmitri.com/comparateur-lego/{slug}-{numero}/
+            const brickmitriUrl = slug
+                ? `https://brickmitri.com/comparateur-lego/${slug}-${cleanNum}/`
+                : `https://brickmitri.com/?s=${encodedNum}`;
+
+            // Avenue de la Brique : recherche directe par numéro de set
+            const avenueUrl = `https://www.avenuedelabrique.com/recherche?q=${encodedNum}`;
+
+            // Planet-Brick : recherche PrestaShop par numéro de set
+            const planetUrl = `https://www.planet-brick.com/recherche?controller=search&s=${encodedNum}`;
+
+            return {
+                avenue: avenueUrl,
+                brickmitri: brickmitriUrl,
+                planet: planetUrl
+            };
+        }
+
+        function updateLiveComparatorLinks() {
+            const num = document.getElementById('set-number').value.trim();
+            const name = document.getElementById('set-name').value.trim();
+            const bar = document.getElementById('live-comparator-bar');
+            if (num.length >= 3) {
+                const urls = getComparatorUrls(num, name);
+                document.getElementById('live-link-adlb').href = urls.avenue;
+                document.getElementById('live-link-bm').href = urls.brickmitri;
+                document.getElementById('live-link-pb').href = urls.planet;
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        function openComparatorHelper(prefillNumber = '', prefillName = '') {
+            document.getElementById('quick-comp-number').value = prefillNumber;
+            document.getElementById('quick-comp-name').value = prefillName;
+            updateQuickCompModalLinks();
+            openModal('comparator-modal');
+        }
+
+        function updateQuickCompModalLinks() {
+            const num = document.getElementById('quick-comp-number').value.trim();
+            const name = document.getElementById('quick-comp-name').value.trim();
+            const urls = num ? getComparatorUrls(num, name) : {
+                avenue: 'https://www.avenuedelabrique.com',
+                brickmitri: 'https://brickmitri.com',
+                planet: 'https://www.planet-brick.com'
+            };
+            document.getElementById('qcomp-adlb').href = urls.avenue;
+            document.getElementById('qcomp-bm').href = urls.brickmitri;
+            document.getElementById('qcomp-pb').href = urls.planet;
+        }
+
+        // =========================================================================
+        // INITIALISATION & SUPABASE
         // =========================================================================
         window.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
@@ -695,7 +885,7 @@
                 await initializeCloudWishlist();
             } catch (err) {
                 console.error('Supabase initialization error:', err);
-                showToast('Connexion à la base impossible. Vérifie la configuration Supabase.', 'error');
+                showToast('Mode hors-ligne actif (Supabase indisponible).', 'error');
                 loadLocalFallback();
             }
             renderSets();
@@ -709,7 +899,10 @@
                     appState.title = parsed.title || 'Ma Wishlist LEGO';
                     appState.sets = Array.isArray(parsed.sets) ? parsed.sets : [];
                     appState.isDemo = Boolean(parsed.isDemo);
-                } catch (_) { appState.sets = [...DEFAULT_DEMO_SETS]; appState.isDemo = true; }
+                } catch (_) {
+                    appState.sets = [...DEFAULT_DEMO_SETS];
+                    appState.isDemo = true;
+                }
             } else {
                 appState.sets = [...DEFAULT_DEMO_SETS];
                 appState.isDemo = true;
@@ -734,7 +927,6 @@
             if (setsError) throw setsError;
 
             if (!cloudRows || cloudRows.length === 0) {
-                // Migration automatique : le premier navigateur transfère son localStorage.
                 const saved = localStorage.getItem(STORAGE_KEY);
                 let local = null;
                 if (saved) { try { local = JSON.parse(saved); } catch (_) {} }
@@ -749,9 +941,12 @@
                     });
                     const { error: insertError } = await supabaseClient.from('lego_sets').upsert(cleanRows);
                     if (insertError) throw insertError;
-                    // Les anciennes réservations locales sont importées comme réservations migrées.
                     for (const set of migrationSets.filter(x => x.reservedBy)) {
-                        const { error: reserveError } = await supabaseClient.from('reservations').insert({ set_id: String(set.id), owner_id: currentUserId, reserved_by: String(set.reservedBy) });
+                        const { error: reserveError } = await supabaseClient.from('reservations').insert({
+                            set_id: String(set.id),
+                            owner_id: currentUserId,
+                            reserved_by: String(set.reservedBy)
+                        });
                         if (reserveError && reserveError.code !== '23505') console.warn(reserveError);
                     }
                 }
@@ -762,7 +957,6 @@
             subscribeToCloudChanges();
             document.getElementById('list-title-display').textContent = appState.title;
             updateDemoBanner();
-            showToast('Wishlist synchronisée avec la famille !', 'success');
         }
 
         async function refreshCloudData() {
@@ -801,7 +995,8 @@
         async function syncSetToCloud(set) {
             if (!cloudReady) return;
             const data = { ...set };
-            delete data.reservedBy; delete data.reservationOwnerId;
+            delete data.reservedBy;
+            delete data.reservationOwnerId;
             const { error } = await supabaseClient.from('lego_sets').upsert({ id: String(set.id), data });
             if (error) throw error;
         }
@@ -813,16 +1008,24 @@
             updateDemoBanner();
         }
 
-        function importSharedToLocal() { showToast('La wishlist est déjà partagée et synchronisée en ligne.', 'info'); }
+        function importSharedToLocal() {
+            showToast('La wishlist est déjà synchronisée en ligne.', 'info');
+        }
 
         async function clearDemoData() {
             appState.sets = [];
             appState.isDemo = false;
             saveToLocalStorage();
             try {
-                if (cloudReady) { const { error } = await supabaseClient.from('lego_sets').delete().neq('id', '__none__'); if (error) throw error; }
-                renderSets(); showToast('Les sets ont été supprimés.', 'info');
-            } catch (err) { showToast('Erreur de suppression : ' + (err.message || err), 'error'); }
+                if (cloudReady) {
+                    const { error } = await supabaseClient.from('lego_sets').delete().neq('id', '__none__');
+                    if (error) throw error;
+                }
+                renderSets();
+                showToast('Les sets ont été supprimés.', 'info');
+            } catch (err) {
+                showToast('Erreur de suppression : ' + (err.message || err), 'error');
+            }
         }
 
         function updateDemoBanner() {
@@ -838,7 +1041,6 @@
         // GESTION DES MODES (MOI vs FAMILLE)
         // =========================================================================
         function setMode(mode) {
-            // Un visiteur arrivé par le lien famille ne peut pas repasser en édition.
             if (isFamilyShareLink && mode === 'edit') return;
             currentMode = mode;
             updateModeUI();
@@ -853,7 +1055,6 @@
             const shareBtn = document.getElementById('share-btn');
             const backupBtn = document.getElementById('backup-btn');
 
-            // Sur un lien famille, on ne montre que l'onglet Famille et les fonctions utiles aux proches.
             if (isFamilyShareLink) {
                 editBtn.classList.add('hidden');
                 shareBtn?.classList.add('hidden');
@@ -880,58 +1081,12 @@
         }
 
         // =========================================================================
-        // LIENS COMPARATEURS DE PRIX
-        // =========================================================================
-        function getComparatorUrls(setNumber) {
-            const cleanNum = encodeURIComponent(String(setNumber).trim());
-            return {
-                avenue: `https://www.avenuedelabrique.com/recherche?q=${cleanNum}`,
-                brickmitri: `https://www.brickmitri.fr/recherche?q=${cleanNum}`,
-                planet: `https://www.planet-brick.com/recherche?controller=search&s=${cleanNum}`
-            };
-        }
-
-        function updateLiveComparatorLinks() {
-            const num = document.getElementById('set-number').value.trim();
-            const bar = document.getElementById('live-comparator-bar');
-            if (num.length >= 3) {
-                const urls = getComparatorUrls(num);
-                document.getElementById('live-link-adlb').href = urls.avenue;
-                document.getElementById('live-link-bm').href = urls.brickmitri;
-                document.getElementById('live-link-pb').href = urls.planet;
-                bar.classList.remove('hidden');
-            } else {
-                bar.classList.add('hidden');
-            }
-        }
-
-        function openComparatorHelper(prefillNumber = '') {
-            const input = document.getElementById('quick-comp-number');
-            input.value = prefillNumber;
-            updateQuickCompModalLinks();
-            openModal('comparator-modal');
-        }
-
-        function updateQuickCompModalLinks() {
-            const num = document.getElementById('quick-comp-number').value.trim();
-            const urls = num ? getComparatorUrls(num) : {
-                avenue: 'https://www.avenuedelabrique.com',
-                brickmitri: 'https://www.brickmitri.fr',
-                planet: 'https://www.planet-brick.com'
-            };
-            document.getElementById('qcomp-adlb').href = urls.avenue;
-            document.getElementById('qcomp-bm').href = urls.brickmitri;
-            document.getElementById('qcomp-pb').href = urls.planet;
-        }
-
-        // =========================================================================
         // RENDU DE LA GRILLE ET STATISTIQUES
         // =========================================================================
         function renderSets() {
             const grid = document.getElementById('sets-grid');
             const emptyState = document.getElementById('empty-state');
 
-            // Récupérer filtres
             const searchQuery = document.getElementById('filter-search').value.toLowerCase().trim();
             const occasionFilter = document.getElementById('filter-occasion').value;
             const themeFilter = document.getElementById('filter-theme').value;
@@ -939,7 +1094,6 @@
             const hideReserved = document.getElementById('filter-hide-reserved').checked;
             const sortBy = document.getElementById('sort-by').value;
 
-            // Filtrer
             let filtered = appState.sets.filter(set => {
                 if (searchQuery && !set.number.toLowerCase().includes(searchQuery) && !set.name.toLowerCase().includes(searchQuery)) {
                     return false;
@@ -959,28 +1113,17 @@
                 return true;
             });
 
-            // Trier
             const priorityWeight = { high: 3, medium: 2, low: 1 };
             filtered.sort((a, b) => {
-                if (sortBy === 'priority') {
-                    return (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0);
-                }
-                if (sortBy === 'price-asc') {
-                    return (a.price || 0) - (b.price || 0);
-                }
-                if (sortBy === 'price-desc') {
-                    return (b.price || 0) - (a.price || 0);
-                }
-                if (sortBy === 'number') {
-                    return String(a.number).localeCompare(String(b.number), undefined, { numeric: true });
-                }
+                if (sortBy === 'priority') return (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0);
+                if (sortBy === 'price-asc') return (a.price || 0) - (b.price || 0);
+                if (sortBy === 'price-desc') return (b.price || 0) - (a.price || 0);
+                if (sortBy === 'number') return String(a.number).localeCompare(String(b.number), undefined, { numeric: true });
                 return 0;
             });
 
-            // Mettre à jour les statistiques globales
             updateStats();
 
-            // Affichage
             if (filtered.length === 0) {
                 grid.innerHTML = '';
                 emptyState.classList.remove('hidden');
@@ -1006,6 +1149,13 @@
         function getThemeBadgeColor(theme) {
             const map = {
                 'Star Wars': 'bg-slate-900 text-amber-400',
+                'Batman': 'bg-zinc-800 text-yellow-400',
+                'DC': 'bg-blue-900 text-white',
+                'Marvel': 'bg-red-700 text-white',
+                'Simpsons': 'bg-yellow-300 text-slate-900',
+                'Scooby-Doo': 'bg-teal-600 text-amber-200',
+                'One Piece': 'bg-rose-600 text-amber-100',
+                'Friends': 'bg-fuchsia-100 text-fuchsia-900',
                 'Icons': 'bg-amber-100 text-amber-900',
                 'Technic': 'bg-orange-100 text-orange-800',
                 'Harry Potter': 'bg-purple-100 text-purple-900',
@@ -1029,24 +1179,30 @@
         }
 
         function createSetCardHTML(set) {
-            const urls = getComparatorUrls(set.number);
+            const urls = getComparatorUrls(set.number, set.name);
             const isReserved = Boolean(set.reservedBy);
             const canCancelReservation = Boolean(isReserved && set.reservationOwnerId && set.reservationOwnerId === currentUserId);
             const priceFormatted = set.price ? `${parseFloat(set.price).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €` : 'Prix non défini';
 
-            // Vignette visuelle (Image custom ou belle illustration SVG LEGO générée avec numéro)
+            // Bloc dates sortie / retrait sous le titre
+            const datesParts = [];
+            if (set.releaseDate) datesParts.push(`<span>📅 Sortie : <strong>${escapeHTML(set.releaseDate)}</strong></span>`);
+            if (set.retireDate) datesParts.push(`<span>⏳ Retrait : <strong>${escapeHTML(set.retireDate)}</strong></span>`);
+            const datesHTML = datesParts.length > 0
+                ? `<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 mt-1 mb-1.5">${datesParts.join('')}</div>`
+                : '';
+
             const visualHeader = set.image
                 ? `<img src="${escapeHTML(set.image)}" alt="LEGO ${escapeHTML(set.number)}" onerror="this.onerror=null;this.parentElement.innerHTML=generateLegoPlaceholderSVG('${escapeHTML(set.number)}', '${escapeHTML(set.theme)}')" class="w-full h-44 object-contain bg-white p-3">`
                 : generateLegoPlaceholderSVG(set.number, set.theme);
 
-            // Actions bas de carte selon le mode (Moi vs Famille)
             let footerActions = '';
             if (currentMode === 'edit') {
                 footerActions = `
                     <div class="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
                         <button ${isReserved && !canCancelReservation ? 'disabled title="Réservé par un autre membre"' : ''} onclick="${isReserved ? (canCancelReservation ? `cancelReservation('${set.id}')` : '') : `openReserveModal('${set.id}')`}" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1.5 ${isReserved ? (canCancelReservation ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-emerald-50 text-emerald-700 cursor-not-allowed opacity-80') : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
                             <i data-lucide="${isReserved ? 'check-circle' : 'gift'}" class="w-3.5 h-3.5"></i>
-                            <span>${isReserved ? (canCancelReservation ? `Annuler ma réservation (${escapeHTML(set.reservedBy)})` : `Réservé (${escapeHTML(set.reservedBy)})`) : 'Réserver'}</span>
+                            <span>${isReserved ? (canCancelReservation ? `Annuler (${escapeHTML(set.reservedBy)})` : `Réservé (${escapeHTML(set.reservedBy)})`) : 'Réserver'}</span>
                         </button>
                         <div class="flex items-center gap-1">
                             <button onclick="openSetModal('${set.id}')" title="Modifier" class="p-2 text-slate-500 hover:text-lego-blue hover:bg-blue-50 rounded-lg transition">
@@ -1059,7 +1215,6 @@
                     </div>
                 `;
             } else {
-                // Mode Famille
                 if (isReserved) {
                     footerActions = `
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
@@ -1089,12 +1244,11 @@
                     <div class="absolute top-3 right-3 z-10 flex flex-col items-end gap-1.5">
                         ${set.retiringSoon ? `<span class="bg-orange-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">⏳ Bientôt retiré</span>` : ''}
                         ${set.isNew ? `<span class="bg-sky-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">✨ Nouveauté</span>` : ''}
-                        ${set.retired ? `<span class="bg-slate-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">📦 Retiré du catalogue</span>` : ''}
+                        ${set.retired ? `<span class="bg-slate-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">📦 Retiré</span>` : ''}
                         ${set.exclusive ? `<span class="bg-violet-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">💎 Exclusivité</span>` : ''}
                         ${isReserved ? `<span class="bg-lego-green text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">✓ Déjà pris</span>` : ''}
                     </div>
 
-                    <!-- Zone Visuelle / Vignette -->
                     <div class="relative border-b border-slate-100 bg-slate-50/70">
                         ${visualHeader}
                         <span class="absolute top-3 left-3 bg-slate-900/90 text-white font-mono text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm">
@@ -1102,10 +1256,8 @@
                         </span>
                     </div>
 
-                    <!-- Corps de la carte -->
                     <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
                         <div>
-                            <!-- Badges Gamme & Priorité -->
                             <div class="flex flex-wrap items-center gap-1.5 mb-2">
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${getThemeBadgeColor(set.theme)}">
                                     ${escapeHTML(set.theme)}
@@ -1116,34 +1268,32 @@
                                 </span>
                             </div>
 
-                            <!-- Titre & Prix -->
-                            <h3 class="font-display text-lg font-bold text-slate-900 leading-snug mb-1">
+                            <h3 class="font-display text-lg font-bold text-slate-900 leading-snug">
                                 ${escapeHTML(set.name)}
                             </h3>
-                            <p class="text-xl font-bold text-lego-blue">
+                            ${datesHTML}
+                            <p class="text-xl font-bold text-lego-blue mt-1">
                                 ${priceFormatted}
                             </p>
 
-                            <!-- Note personnelle -->
                             ${set.note ? `
-                                <p class="mt-2.5 text-xs text-slate-600 bg-slate-50 border border-slate-200/70 rounded-xl p-2.5 italic">
+                                <p class="mt-2.5 text-xs text-slate-600 bg-slate-50 border border-slate-200/70 rounded-xl p-2.5 italic whitespace-pre-line">
                                     "${escapeHTML(set.note)}"
                                 </p>
                             ` : ''}
                         </div>
 
-                        <!-- Comparateurs de Prix -->
                         <div class="space-y-2">
                             <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-200/70">
                                 <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center justify-between">
                                     <span>Comparer les prix :</span>
-                                    <button onclick="openComparatorHelper('${escapeHTML(set.number)}')" class="text-lego-blue hover:underline lowercase font-medium">infos</button>
+                                    <button onclick="openComparatorHelper('${escapeHTML(set.number)}', '${escapeHTML(set.name).replace(/'/g, "\\'")}')" class="text-lego-blue hover:underline lowercase font-medium">infos</button>
                                 </p>
                                 <div class="grid grid-cols-3 gap-1.5">
                                     <a href="${urls.avenue}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-amber-100/80 hover:bg-amber-200 text-amber-950 font-semibold rounded-lg text-[11px] transition truncate" title="Voir sur Avenue de la Brique">
                                         Av. Brique ↗
                                     </a>
-                                    <a href="${urls.brickmitri}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-blue-100/80 hover:bg-blue-200 text-blue-950 font-semibold rounded-lg text-[11px] transition truncate" title="Voir sur Brickmitri">
+                                    <a href="${urls.brickmitri}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-blue-100/80 hover:bg-blue-200 text-blue-950 font-semibold rounded-lg text-[11px] transition truncate" title="Voir sur Brickmitri.com">
                                         Brickmitri ↗
                                     </a>
                                     <a href="${urls.planet}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-emerald-100/80 hover:bg-emerald-200 text-emerald-950 font-semibold rounded-lg text-[11px] transition truncate" title="Voir sur Planet-Brick">
@@ -1182,6 +1332,9 @@
             const form = document.getElementById('set-form');
             form.reset();
             document.getElementById('set-id').value = '';
+            document.getElementById('rb-search-input').value = '';
+            document.getElementById('rb-results').classList.add('hidden');
+            document.getElementById('rb-status').textContent = 'N° ou nom anglais';
             document.getElementById('live-comparator-bar').classList.add('hidden');
 
             if (setId) {
@@ -1193,6 +1346,8 @@
                 document.getElementById('set-name').value = set.name;
                 document.getElementById('set-theme').value = set.theme;
                 document.getElementById('set-price').value = set.price || '';
+                document.getElementById('set-release-date').value = set.releaseDate || '';
+                document.getElementById('set-retire-date').value = set.retireDate || '';
                 document.getElementById('set-priority').value = set.priority || 'medium';
                 document.getElementById('set-occasion').value = set.occasion || 'Les deux';
                 document.getElementById('set-image').value = set.image || '';
@@ -1218,6 +1373,8 @@
             const theme = document.getElementById('set-theme').value;
             const priceVal = parseFloat(document.getElementById('set-price').value);
             const price = isNaN(priceVal) ? null : priceVal;
+            const releaseDate = document.getElementById('set-release-date').value.trim();
+            const retireDate = document.getElementById('set-retire-date').value.trim();
             const priority = document.getElementById('set-priority').value;
             const occasion = document.getElementById('set-occasion').value;
             const image = document.getElementById('set-image').value.trim();
@@ -1234,7 +1391,8 @@
                 if (index !== -1) {
                     appState.sets[index] = {
                         ...appState.sets[index],
-                        number, name, theme, price, priority, occasion, image, note,
+                        number, name, theme, price, releaseDate, retireDate,
+                        priority, occasion, image, note,
                         retiringSoon, isNew, retired, exclusive
                     };
                     showToast(`Set #${number} mis à jour !`, 'success');
@@ -1242,7 +1400,8 @@
             } else {
                 const newSet = {
                     id: 'set-' + Date.now(),
-                    number, name, theme, price, priority, occasion, image, note,
+                    number, name, theme, price, releaseDate, retireDate,
+                    priority, occasion, image, note,
                     retiringSoon, isNew, retired, exclusive,
                     reservedBy: ''
                 };
@@ -1255,8 +1414,12 @@
             try {
                 const savedSet = appState.sets.find(s => s.id === (id || appState.sets[0]?.id));
                 if (savedSet) await syncSetToCloud(savedSet);
-                closeModal('set-modal'); renderSets();
-            } catch (err) { console.error(err); showToast('Erreur d’enregistrement en ligne : ' + (err.message || err), 'error'); }
+                closeModal('set-modal');
+                renderSets();
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur d’enregistrement en ligne : ' + (err.message || err), 'error');
+            }
         }
 
         async function deleteSet(setId) {
@@ -1264,11 +1427,17 @@
             if (!set) return;
             appState.sets = appState.sets.filter(s => s.id !== setId);
             saveToLocalStorage();
-            try { const { error } = await supabaseClient.from('lego_sets').delete().eq('id', String(setId)); if (error) throw error; renderSets(); showToast(`Set #${set.number} supprimé.`, 'info'); }
-            catch (err) { showToast('Erreur de suppression en ligne : ' + (err.message || err), 'error'); await refreshCloudData(); }
+            try {
+                const { error } = await supabaseClient.from('lego_sets').delete().eq('id', String(setId));
+                if (error) throw error;
+                renderSets();
+                showToast(`Set #${set.number} supprimé.`, 'info');
+            } catch (err) {
+                showToast('Erreur de suppression en ligne : ' + (err.message || err), 'error');
+                await refreshCloudData();
+            }
         }
 
-        // Réservation Famille
         function openReserveModal(setId) {
             const set = appState.sets.find(s => s.id === setId);
             if (!set) return;
@@ -1286,7 +1455,11 @@
             const set = appState.sets.find(s => String(s.id) === String(id));
             if (!set) return;
             try {
-                const { error } = await supabaseClient.from('reservations').insert({ set_id: String(id), owner_id: currentUserId, reserved_by: name });
+                const { error } = await supabaseClient.from('reservations').insert({
+                    set_id: String(id),
+                    owner_id: currentUserId,
+                    reserved_by: name
+                });
                 if (error) {
                     if (error.code === '23505') showToast('Ce set vient d’être réservé par quelqu’un d’autre.', 'error');
                     else throw error;
@@ -1295,32 +1468,38 @@
                     await refreshCloudData();
                     showToast(`Merci ${name} ! Le set #${set.number} est réservé.`, 'success');
                 }
-            } catch (err) { console.error(err); showToast('Impossible de réserver : ' + (err.message || err), 'error'); }
+            } catch (err) {
+                console.error(err);
+                showToast('Impossible de réserver : ' + (err.message || err), 'error');
+            }
         }
 
         async function cancelReservation(setId) {
             const set = appState.sets.find(s => String(s.id) === String(setId));
             if (!set) return;
-            if (set.reservationOwnerId !== currentUserId) { showToast('Tu peux uniquement annuler tes propres réservations.', 'error'); return; }
+            if (set.reservationOwnerId !== currentUserId) {
+                showToast('Tu peux uniquement annuler tes propres réservations.', 'error');
+                return;
+            }
             try {
                 const { error } = await supabaseClient.from('reservations').delete().eq('set_id', String(setId)).eq('owner_id', currentUserId);
                 if (error) throw error;
                 await refreshCloudData();
                 showToast(`Réservation annulée pour le set #${set.number}.`, 'info');
-            } catch (err) { console.error(err); showToast('Impossible d’annuler : ' + (err.message || err), 'error'); }
+            } catch (err) {
+                console.error(err);
+                showToast('Impossible d’annuler : ' + (err.message || err), 'error');
+            }
         }
 
         // =========================================================================
-        // PARTAGE SANS SERVEUR (URL BASE64 & TEXTE WHATSAPP/SMS)
+        // PARTAGE, JSON & TITRE
         // =========================================================================
         function openShareModal() {
-            // Un lien permanent : les données sont désormais chargées depuis Supabase.
-            // Le lien partagé ouvre directement le mode Famille, sans accès aux commandes d'édition.
             const shareLink = new URL(window.location.href);
             shareLink.searchParams.set('mode', 'family');
             document.getElementById('share-url-input').value = shareLink.toString();
 
-            // 2. Générer le résumé texte formaté
             let lines = [`🧱 *${appState.title}* 🎁\n`];
             if (appState.sets.length === 0) {
                 lines.push('Ma liste est encore vide !');
@@ -1328,13 +1507,12 @@
                 appState.sets.forEach(s => {
                     const status = s.reservedBy ? `✅ [Réservé par ${s.reservedBy}]` : '⬜ Disponible';
                     const priceTxt = s.price ? ` (~${s.price} €)` : '';
-                    const urls = getComparatorUrls(s.number);
+                    const urls = getComparatorUrls(s.number, s.name);
                     lines.push(`${status} *LEGO ${s.number}* - ${s.name}${priceTxt}`);
-                    lines.push(`   👉 Comparer les prix : ${urls.avenue}\n`);
+                    lines.push(`   👉 Comparer les prix : ${urls.brickmitri}\n`);
                 });
             }
             document.getElementById('share-text-area').value = lines.join('\n');
-
             openModal('share-modal');
         }
 
@@ -1346,16 +1524,11 @@
                 document.execCommand('copy');
                 showToast(successMsg, 'success');
             } catch (err) {
-                showToast('Impossible de copier automatiquement. Sélectionnez le texte manuellement.', 'error');
+                showToast('Impossible de copier automatiquement.', 'error');
             }
         }
 
-        // =========================================================================
-        // EXPORT / IMPORT JSON & TITRE
-        // =========================================================================
-        function openBackupModal() {
-            openModal('backup-modal');
-        }
+        function openBackupModal() { openModal('backup-modal'); }
 
         function exportJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
@@ -1382,13 +1555,26 @@
                         isViewingSharedUrl = false;
                         saveToLocalStorage();
                         try {
-                            const { error: clearError } = await supabaseClient.from('lego_sets').delete().neq('id', '__none__'); if (clearError) throw clearError;
-                            const rows = appState.sets.map(set => { const copy = { ...set }; delete copy.reservedBy; delete copy.reservationOwnerId; return { id: String(set.id), data: copy }; });
-                            if (rows.length) { const { error } = await supabaseClient.from('lego_sets').upsert(rows); if (error) throw error; }
-                            const { error: titleError } = await supabaseClient.from('list_settings').upsert({ id: 1, title: appState.title }, { onConflict: 'id' }); if (titleError) throw titleError;
-                        } catch (err) { showToast('Import local uniquement : ' + (err.message || err), 'error'); }
+                            const { error: clearError } = await supabaseClient.from('lego_sets').delete().neq('id', '__none__');
+                            if (clearError) throw clearError;
+                            const rows = appState.sets.map(set => {
+                                const copy = { ...set };
+                                delete copy.reservedBy;
+                                delete copy.reservationOwnerId;
+                                return { id: String(set.id), data: copy };
+                            });
+                            if (rows.length) {
+                                const { error } = await supabaseClient.from('lego_sets').upsert(rows);
+                                if (error) throw error;
+                            }
+                            const { error: titleError } = await supabaseClient.from('list_settings').upsert({ id: 1, title: appState.title }, { onConflict: 'id' });
+                            if (titleError) throw titleError;
+                        } catch (err) {
+                            showToast('Import local uniquement : ' + (err.message || err), 'error');
+                        }
                         document.getElementById('list-title-display').textContent = appState.title;
-                        await refreshCloudData(); renderSets();
+                        await refreshCloudData();
+                        renderSets();
                         closeModal('backup-modal');
                         showToast('Liste importée avec succès !', 'success');
                     } else {
@@ -1413,13 +1599,19 @@
                 appState.title = newTitle;
                 document.getElementById('list-title-display').textContent = newTitle;
                 saveToLocalStorage();
-                try { const { error } = await supabaseClient.from('list_settings').upsert({ id: 1, title: newTitle }, { onConflict: 'id' }); if (error) throw error; closeModal('title-modal'); showToast('Titre mis à jour !', 'success'); }
-                catch (err) { showToast('Erreur de synchronisation du titre : ' + (err.message || err), 'error'); }
+                try {
+                    const { error } = await supabaseClient.from('list_settings').upsert({ id: 1, title: newTitle }, { onConflict: 'id' });
+                    if (error) throw error;
+                    closeModal('title-modal');
+                    showToast('Titre mis à jour !', 'success');
+                } catch (err) {
+                    showToast('Erreur de synchronisation du titre : ' + (err.message || err), 'error');
+                }
             }
         }
 
         // =========================================================================
-        // UTILITAIRES UI (MODALES, FILTRES, TOASTS)
+        // UTILITAIRES UI
         // =========================================================================
         function openModal(id) {
             const modal = document.getElementById(id);
@@ -1455,10 +1647,7 @@
             toast.innerHTML = `<span>${escapeHTML(message)}</span>`;
             container.appendChild(toast);
 
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            });
-
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
