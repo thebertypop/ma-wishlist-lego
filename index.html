@@ -468,7 +468,7 @@
                     <input type="text" id="reserve-by-name" required placeholder="ex: Mamie, Tonton Lucas, Papa..." class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-green focus:outline-none">
                 </div>
                 <p class="text-xs text-slate-500">
-                    💡 Une fois réservé, le set sera marqué comme pris afin que personne d'autre ne l'achète en double. Pensez ensuite à renvoyer le lien mis à jour si vous êtes sur une liste partagée !
+                    💡 La réservation sera immédiatement visible par toute la famille. Vous pourrez l’annuler plus tard depuis ce même navigateur.
                 </p>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeModal('reserve-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm">Annuler</button>
@@ -478,7 +478,7 @@
         </div>
     </div>
 
-    <!-- 3. MODALE PARTAGE (URL SANS SERVEUR & TEXTE WHATSAPP/SMS) -->
+    <!-- 3. MODALE PARTAGE (LIEN PERMANENT & TEXTE WHATSAPP/SMS) -->
     <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden my-auto">
             <div class="bg-lego-blue text-white px-6 py-4 flex items-center justify-between">
@@ -589,7 +589,7 @@
             </div>
             <div class="p-6 space-y-4 text-sm">
                 <p class="text-slate-600 text-xs">
-                    Votre liste est enregistrée automatiquement dans votre navigateur. Vous pouvez aussi télécharger un fichier de sauvegarde sur votre appareil.
+                    Votre liste est synchronisée en ligne avec la famille. Vous pouvez aussi télécharger un fichier de sauvegarde sur votre appareil.
                 </p>
                 <button onclick="exportJSON()" class="w-full py-2.5 px-4 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition">
                     <i data-lucide="download" class="w-4 h-4"></i> Télécharger ma liste (.json)
@@ -619,12 +619,21 @@
         </div>
     </div>
 
+    <!-- Supabase : base de données et synchronisation familiale -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <!-- SCRIPT APPLICATIF -->
     <script>
         // =========================================================================
         // ÉTAT DE L'APPLICATION & DONNÉES INITIALES
         // =========================================================================
         const STORAGE_KEY = 'lego_wishlist_data_v1';
+        const SUPABASE_URL = 'https://nlqdbdzrzdexahexpobf.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_grCrSREgmV_YZgiOgqZ7PA_543o1pME';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUserId = null;
+        let realtimeChannel = null;
+        let cloudReady = false;
         let appState = {
             title: 'Ma Wishlist LEGO',
             sets: [],
@@ -676,60 +685,123 @@
         // =========================================================================
         // INITIALISATION
         // =========================================================================
-        window.addEventListener('DOMContentLoaded', () => {
-            loadInitialData();
+        window.addEventListener('DOMContentLoaded', async () => {
             lucide.createIcons();
             updateModeUI();
             renderSets();
+            try {
+                await initializeCloudWishlist();
+            } catch (err) {
+                console.error('Supabase initialization error:', err);
+                showToast('Connexion à la base impossible. Vérifie la configuration Supabase.', 'error');
+                loadLocalFallback();
+            }
+            renderSets();
         });
 
-        function loadInitialData() {
-            // 1. Vérifier si un hash de partage est présent dans l'URL (#list=...)
-            const hash = window.location.hash;
-            if (hash && hash.startsWith('#list=')) {
-                try {
-                    const encoded = hash.substring(6);
-                    const decodedJson = decodeURIComponent(escape(atob(encoded)));
-                    const parsed = JSON.parse(decodedJson);
-                    if (parsed && Array.isArray(parsed.sets)) {
-                        appState.title = parsed.title || 'Wishlist LEGO partagée';
-                        appState.sets = parsed.sets;
-                        appState.isDemo = false;
-                        isViewingSharedUrl = true;
-                        currentMode = 'family'; // Bascule auto en mode famille
-                        document.getElementById('shared-banner').classList.remove('hidden');
-                        document.getElementById('list-title-display').textContent = appState.title;
-                        return;
-                    }
-                } catch (e) {
-                    console.error('Erreur lecture lien partagé:', e);
-                    showToast('Le lien partagé semble invalide ou incomplet.', 'error');
-                }
-            }
-
-            // 2. Sinon charger depuis localStorage
+        function loadLocalFallback() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    appState = {
-                        title: parsed.title || 'Ma Wishlist LEGO',
-                        sets: Array.isArray(parsed.sets) ? parsed.sets : [],
-                        isDemo: Boolean(parsed.isDemo)
-                    };
-                } catch (e) {
-                    appState.sets = [...DEFAULT_DEMO_SETS];
-                    appState.isDemo = true;
-                }
+                    appState.title = parsed.title || 'Ma Wishlist LEGO';
+                    appState.sets = Array.isArray(parsed.sets) ? parsed.sets : [];
+                    appState.isDemo = Boolean(parsed.isDemo);
+                } catch (_) { appState.sets = [...DEFAULT_DEMO_SETS]; appState.isDemo = true; }
             } else {
-                // Premier lancement : pré-remplir avec les exemples
                 appState.sets = [...DEFAULT_DEMO_SETS];
                 appState.isDemo = true;
                 saveToLocalStorage();
             }
-
             document.getElementById('list-title-display').textContent = appState.title;
             updateDemoBanner();
+        }
+
+        async function initializeCloudWishlist() {
+            const { data: authData, error: authError } = await supabaseClient.auth.getSession();
+            if (authError) throw authError;
+            let session = authData.session;
+            if (!session) {
+                const { data, error } = await supabaseClient.auth.signInAnonymously();
+                if (error) throw error;
+                session = data.session;
+            }
+            currentUserId = session.user.id;
+
+            const { data: cloudRows, error: setsError } = await supabaseClient.from('lego_sets').select('id,data').order('created_at', { ascending: true });
+            if (setsError) throw setsError;
+
+            if (!cloudRows || cloudRows.length === 0) {
+                // Migration automatique : le premier navigateur transfère son localStorage.
+                const saved = localStorage.getItem(STORAGE_KEY);
+                let local = null;
+                if (saved) { try { local = JSON.parse(saved); } catch (_) {} }
+                const migrationSets = local && Array.isArray(local.sets) ? local.sets : [...DEFAULT_DEMO_SETS];
+                const title = local?.title || 'Ma Wishlist LEGO';
+                if (migrationSets.length) {
+                    const cleanRows = migrationSets.map(set => {
+                        const copy = { ...set };
+                        delete copy.reservedBy;
+                        delete copy.reservationOwnerId;
+                        return { id: String(set.id), data: copy };
+                    });
+                    const { error: insertError } = await supabaseClient.from('lego_sets').upsert(cleanRows);
+                    if (insertError) throw insertError;
+                    // Les anciennes réservations locales sont importées comme réservations migrées.
+                    for (const set of migrationSets.filter(x => x.reservedBy)) {
+                        const { error: reserveError } = await supabaseClient.from('reservations').insert({ set_id: String(set.id), owner_id: currentUserId, reserved_by: String(set.reservedBy) });
+                        if (reserveError && reserveError.code !== '23505') console.warn(reserveError);
+                    }
+                }
+                await supabaseClient.from('list_settings').upsert({ id: 1, title }, { onConflict: 'id' });
+            }
+            await refreshCloudData();
+            cloudReady = true;
+            subscribeToCloudChanges();
+            document.getElementById('list-title-display').textContent = appState.title;
+            updateDemoBanner();
+            showToast('Wishlist synchronisée avec la famille !', 'success');
+        }
+
+        async function refreshCloudData() {
+            const [{ data: rows, error: rowsError }, { data: reservations, error: reservationsError }, { data: settings, error: settingsError }] = await Promise.all([
+                supabaseClient.from('lego_sets').select('id,data').order('created_at', { ascending: true }),
+                supabaseClient.from('reservations').select('set_id,owner_id,reserved_by'),
+                supabaseClient.from('list_settings').select('title').eq('id', 1).maybeSingle()
+            ]);
+            if (rowsError) throw rowsError;
+            if (reservationsError) throw reservationsError;
+            if (settingsError) throw settingsError;
+            const reservationMap = new Map((reservations || []).map(r => [String(r.set_id), r]));
+            appState.sets = (rows || []).map(row => {
+                const set = { ...row.data, id: String(row.id) };
+                const reservation = reservationMap.get(String(row.id));
+                set.reservedBy = reservation?.reserved_by || '';
+                set.reservationOwnerId = reservation?.owner_id || null;
+                return set;
+            });
+            appState.title = settings?.title || 'Ma Wishlist LEGO';
+            appState.isDemo = false;
+            saveToLocalStorage();
+            document.getElementById('list-title-display').textContent = appState.title;
+            renderSets();
+        }
+
+        function subscribeToCloudChanges() {
+            if (realtimeChannel) supabaseClient.removeChannel(realtimeChannel);
+            realtimeChannel = supabaseClient.channel('wishlist-family-live')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'lego_sets' }, () => refreshCloudData().catch(console.error))
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, () => refreshCloudData().catch(console.error))
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'list_settings' }, () => refreshCloudData().catch(console.error))
+                .subscribe();
+        }
+
+        async function syncSetToCloud(set) {
+            if (!cloudReady) return;
+            const data = { ...set };
+            delete data.reservedBy; delete data.reservationOwnerId;
+            const { error } = await supabaseClient.from('lego_sets').upsert({ id: String(set.id), data });
+            if (error) throw error;
         }
 
         function saveToLocalStorage() {
@@ -739,21 +811,16 @@
             updateDemoBanner();
         }
 
-        function importSharedToLocal() {
-            isViewingSharedUrl = false;
-            saveToLocalStorage();
-            window.history.replaceState(null, '', window.location.pathname + window.location.search);
-            document.getElementById('shared-banner').classList.add('hidden');
-            setMode('edit');
-            showToast('Liste sauvegardée sur votre appareil !', 'success');
-        }
+        function importSharedToLocal() { showToast('La wishlist est déjà partagée et synchronisée en ligne.', 'info'); }
 
-        function clearDemoData() {
+        async function clearDemoData() {
             appState.sets = [];
             appState.isDemo = false;
             saveToLocalStorage();
-            renderSets();
-            showToast('Les sets d\'exemple ont été supprimés.', 'info');
+            try {
+                if (cloudReady) { const { error } = await supabaseClient.from('lego_sets').delete().neq('id', '__none__'); if (error) throw error; }
+                renderSets(); showToast('Les sets ont été supprimés.', 'info');
+            } catch (err) { showToast('Erreur de suppression : ' + (err.message || err), 'error'); }
         }
 
         function updateDemoBanner() {
@@ -945,6 +1012,7 @@
         function createSetCardHTML(set) {
             const urls = getComparatorUrls(set.number);
             const isReserved = Boolean(set.reservedBy);
+            const canCancelReservation = Boolean(isReserved && set.reservationOwnerId && set.reservationOwnerId === currentUserId);
             const priceFormatted = set.price ? `${parseFloat(set.price).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €` : 'Prix non défini';
 
             // Vignette visuelle (Image custom ou belle illustration SVG LEGO générée avec numéro)
@@ -957,9 +1025,9 @@
             if (currentMode === 'edit') {
                 footerActions = `
                     <div class="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
-                        <button onclick="${isReserved ? `cancelReservation('${set.id}')` : `openReserveModal('${set.id}')`}" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1.5 ${isReserved ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+                        <button ${isReserved && !canCancelReservation ? 'disabled title="Réservé par un autre membre"' : ''} onclick="${isReserved ? (canCancelReservation ? `cancelReservation('${set.id}')` : '') : `openReserveModal('${set.id}')`}" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1.5 ${isReserved ? (canCancelReservation ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-emerald-50 text-emerald-700 cursor-not-allowed opacity-80') : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
                             <i data-lucide="${isReserved ? 'check-circle' : 'gift'}" class="w-3.5 h-3.5"></i>
-                            <span>${isReserved ? `Réservé (${escapeHTML(set.reservedBy)})` : 'Marquer réservé'}</span>
+                            <span>${isReserved ? (canCancelReservation ? `Annuler ma réservation (${escapeHTML(set.reservedBy)})` : `Réservé (${escapeHTML(set.reservedBy)})`) : 'Réserver'}</span>
                         </button>
                         <div class="flex items-center gap-1">
                             <button onclick="openSetModal('${set.id}')" title="Modifier" class="p-2 text-slate-500 hover:text-lego-blue hover:bg-blue-50 rounded-lg transition">
@@ -981,7 +1049,7 @@
                                     <i data-lucide="check-circle-2" class="w-4 h-4 text-lego-green shrink-0"></i>
                                     Réservé par ${escapeHTML(set.reservedBy)}
                                 </span>
-                                <button onclick="cancelReservation('${set.id}')" class="text-[11px] underline text-emerald-700 hover:text-emerald-950">Annuler</button>
+                                ${canCancelReservation ? `<button onclick="cancelReservation('${set.id}')" class="text-[11px] underline text-emerald-700 hover:text-emerald-950">Annuler</button>` : '<span class="text-[11px] text-emerald-700">Déjà pris</span>'}
                             </div>
                         </div>
                     `;
@@ -1123,7 +1191,7 @@
             lucide.createIcons();
         }
 
-        function saveSet(event) {
+        async function saveSet(event) {
             event.preventDefault();
             const id = document.getElementById('set-id').value;
             const number = document.getElementById('set-number').value.trim();
@@ -1165,17 +1233,20 @@
             }
 
             saveToLocalStorage();
-            closeModal('set-modal');
-            renderSets();
+            try {
+                const savedSet = appState.sets.find(s => s.id === (id || appState.sets[0]?.id));
+                if (savedSet) await syncSetToCloud(savedSet);
+                closeModal('set-modal'); renderSets();
+            } catch (err) { console.error(err); showToast('Erreur d’enregistrement en ligne : ' + (err.message || err), 'error'); }
         }
 
-        function deleteSet(setId) {
+        async function deleteSet(setId) {
             const set = appState.sets.find(s => s.id === setId);
             if (!set) return;
             appState.sets = appState.sets.filter(s => s.id !== setId);
             saveToLocalStorage();
-            renderSets();
-            showToast(`Set #${set.number} supprimé.`, 'info');
+            try { const { error } = await supabaseClient.from('lego_sets').delete().eq('id', String(setId)); if (error) throw error; renderSets(); showToast(`Set #${set.number} supprimé.`, 'info'); }
+            catch (err) { showToast('Erreur de suppression en ligne : ' + (err.message || err), 'error'); await refreshCloudData(); }
         }
 
         // Réservation Famille
@@ -1188,54 +1259,44 @@
             openModal('reserve-modal');
         }
 
-        function confirmReservation(event) {
+        async function confirmReservation(event) {
             event.preventDefault();
             const id = document.getElementById('reserve-set-id').value;
             const name = document.getElementById('reserve-by-name').value.trim();
-            if (!name) return;
-
-            const set = appState.sets.find(s => s.id === id);
-            if (set) {
-                set.reservedBy = name;
-                saveToLocalStorage();
-                renderSets();
-                closeModal('reserve-modal');
-                showToast(`Merci ${name} ! Le set #${set.number} est réservé.`, 'success');
-
-                // Si l'utilisateur consulte un lien partagé, on lui propose de copier le nouveau lien à jour
-                if (isViewingSharedUrl) {
-                    setTimeout(() => openShareModal(), 600);
+            if (!name || !currentUserId) return;
+            const set = appState.sets.find(s => String(s.id) === String(id));
+            if (!set) return;
+            try {
+                const { error } = await supabaseClient.from('reservations').insert({ set_id: String(id), owner_id: currentUserId, reserved_by: name });
+                if (error) {
+                    if (error.code === '23505') showToast('Ce set vient d’être réservé par quelqu’un d’autre.', 'error');
+                    else throw error;
+                } else {
+                    closeModal('reserve-modal');
+                    await refreshCloudData();
+                    showToast(`Merci ${name} ! Le set #${set.number} est réservé.`, 'success');
                 }
-            }
+            } catch (err) { console.error(err); showToast('Impossible de réserver : ' + (err.message || err), 'error'); }
         }
 
-        function cancelReservation(setId) {
-            const set = appState.sets.find(s => s.id === setId);
-            if (set) {
-                set.reservedBy = '';
-                saveToLocalStorage();
-                renderSets();
+        async function cancelReservation(setId) {
+            const set = appState.sets.find(s => String(s.id) === String(setId));
+            if (!set) return;
+            if (set.reservationOwnerId !== currentUserId) { showToast('Tu peux uniquement annuler tes propres réservations.', 'error'); return; }
+            try {
+                const { error } = await supabaseClient.from('reservations').delete().eq('set_id', String(setId)).eq('owner_id', currentUserId);
+                if (error) throw error;
+                await refreshCloudData();
                 showToast(`Réservation annulée pour le set #${set.number}.`, 'info');
-            }
+            } catch (err) { console.error(err); showToast('Impossible d’annuler : ' + (err.message || err), 'error'); }
         }
 
         // =========================================================================
         // PARTAGE SANS SERVEUR (URL BASE64 & TEXTE WHATSAPP/SMS)
         // =========================================================================
         function openShareModal() {
-            // 1. Générer l'URL encodée
-            const payload = {
-                title: appState.title,
-                sets: appState.sets
-            };
-            const jsonStr = JSON.stringify(payload);
-            const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-            // IMPORTANT : utiliser l'URL de l'application hébergée (GitHub Pages),
-            // et non l'URL googleusercontent de l'iframe Google Sites.
-            // Comme le fichier est chargé depuis GitHub Pages, window.location pointe
-            // sur GitHub Pages même lorsque la wishlist est intégrée dans Google Sites.
-            const baseUrl = window.location.origin + window.location.pathname + window.location.search;
-            const shareUrl = `${baseUrl}#list=${encoded}`;
+            // Un lien permanent : les données sont désormais chargées depuis Supabase.
+            const shareUrl = window.location.origin + window.location.pathname + window.location.search;
             document.getElementById('share-url-input').value = shareUrl;
 
             // 2. Générer le résumé texte formaté
@@ -1286,11 +1347,11 @@
             showToast('Fichier de sauvegarde téléchargé !', 'success');
         }
 
-        function importJSON(event) {
+        async function importJSON(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (imported && Array.isArray(imported.sets)) {
@@ -1299,8 +1360,14 @@
                         appState.isDemo = false;
                         isViewingSharedUrl = false;
                         saveToLocalStorage();
+                        try {
+                            const { error: clearError } = await supabaseClient.from('lego_sets').delete().neq('id', '__none__'); if (clearError) throw clearError;
+                            const rows = appState.sets.map(set => { const copy = { ...set }; delete copy.reservedBy; delete copy.reservationOwnerId; return { id: String(set.id), data: copy }; });
+                            if (rows.length) { const { error } = await supabaseClient.from('lego_sets').upsert(rows); if (error) throw error; }
+                            const { error: titleError } = await supabaseClient.from('list_settings').upsert({ id: 1, title: appState.title }, { onConflict: 'id' }); if (titleError) throw titleError;
+                        } catch (err) { showToast('Import local uniquement : ' + (err.message || err), 'error'); }
                         document.getElementById('list-title-display').textContent = appState.title;
-                        renderSets();
+                        await refreshCloudData(); renderSets();
                         closeModal('backup-modal');
                         showToast('Liste importée avec succès !', 'success');
                     } else {
@@ -1318,15 +1385,15 @@
             openModal('title-modal');
         }
 
-        function saveListTitle(event) {
+        async function saveListTitle(event) {
             event.preventDefault();
             const newTitle = document.getElementById('list-title-input').value.trim();
             if (newTitle) {
                 appState.title = newTitle;
                 document.getElementById('list-title-display').textContent = newTitle;
                 saveToLocalStorage();
-                closeModal('title-modal');
-                showToast('Titre mis à jour !', 'success');
+                try { const { error } = await supabaseClient.from('list_settings').upsert({ id: 1, title: newTitle }, { onConflict: 'id' }); if (error) throw error; closeModal('title-modal'); showToast('Titre mis à jour !', 'success'); }
+                catch (err) { showToast('Erreur de synchronisation du titre : ' + (err.message || err), 'error'); }
             }
         }
 
