@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Wishlist LEGO | Noël & Anniversaire</title>
+    <!-- Hébergement conseillé : GitHub Pages. Google Sites peut intégrer l’URL GitHub Pages. -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Fredoka (pour une touche ludique LEGO) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif'],
+                    },
+                    colors: {
+                        lego: {
+                            yellow: '#FFCF00',
+                            yellowHover: '#F2C200',
+                            red: '#D01012',
+                            redHover: '#B00D0F',
+                            blue: '#006CB7',
+                            blueHover: '#005591',
+                            green: '#00852B',
+                            dark: '#1E293B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Texture subtil de tenons LEGO en arrière-plan du header */
+        .lego-studs-bg {
+            background-color: #FFCF00;
+            background-image: radial-gradient(rgba(215, 165, 0, 0.35) 22%, transparent 23%),
+                              radial-gradient(rgba(255, 255, 255, 0.45) 22%, transparent 23%);
+            background-size: 36px 36px;
+            background-position: 0 0, 1px 1px;
+        }
+        /* Transitions fluides */
+        .card-hover {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+        }
+        /* Scrollbar personnalisée */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- NOTIFICATION TOAST (Remplace alert) -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- BANNIÈRE MODE FAMILLE / PARTAGE URL -->
+    <div id="shared-banner" class="hidden bg-lego-blue text-white text-sm py-2.5 px-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <i data-lucide="gift" class="w-4 h-4 text-lego-yellow shrink-0"></i>
+                <span>Vous consultez une <strong>liste partagée</strong> ! Vous pouvez réserver un set pour éviter les doublons.</span>
+            </div>
+            <button onclick="importSharedToLocal()" class="bg-white/20 hover:bg-white/30 text-white font-medium px-3 py-1 rounded-lg text-xs transition flex items-center gap-1.5">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Sauvegarder cette liste sur mon appareil
+            </button>
+        </div>
+    </div>
+
+    <!-- HEADER PRINCIPAL -->
+    <header class="lego-studs-bg border-b-4 border-amber-400/60 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <!-- Logo & Titre -->
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 bg-lego-red rounded-xl shadow-md border-2 border-white flex items-center justify-center shrink-0 transform -rotate-3">
+                        <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 4h3v2H7V4zm7 0h3v2h-3V4zM4 7h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 id="list-title-display" class="font-display text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+                                Ma Wishlist LEGO
+                            </h1>
+                            <button id="edit-title-btn" onclick="openTitleModal()" title="Renommer ma liste" class="p-1.5 bg-white/70 hover:bg-white rounded-lg text-slate-700 transition">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <p class="text-slate-800/80 text-xs sm:text-sm font-medium">
+                            Idées cadeaux Noël & Anniversaire • Comparateurs intégrés
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Actions Principales & Bascule Mode -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <!-- Bascule Mode Édition / Mode Famille -->
+                    <div class="bg-white/90 backdrop-blur p-1 rounded-xl shadow-sm border border-amber-300 flex items-center">
+                        <button id="mode-edit-btn" onclick="setMode('edit')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition">
+                            <i data-lucide="wrench" class="w-4 h-4"></i>
+                            <span>Moi (Édition)</span>
+                        </button>
+                        <button id="mode-family-btn" onclick="setMode('family')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <span>Famille (Offrir)</span>
+                        </button>
+                    </div>
+
+                    <!-- Bouton Partager -->
+                    <button onclick="openShareModal()" class="bg-lego-blue hover:bg-lego-blueHover text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 text-sm">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                        <span>Partager</span>
+                    </button>
+
+                    <!-- Bouton Ajouter un Set (Visible en mode édition) -->
+                    <button id="add-set-btn" onclick="openSetModal()" class="bg-lego-red hover:bg-lego-redHover text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 text-sm">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Ajouter un set</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BARRE DE STATISTIQUES -->
+            <div class="grid grid-cols-3 gap-3 mt-5">
+                <div class="bg-white/95 backdrop-blur rounded-xl p-3 sm:px-4 shadow-sm border border-amber-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Sets souhaités</p>
+                        <p id="stat-total-sets" class="font-display text-xl sm:text-2xl font-bold text-slate-900">0</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center hidden sm:flex">
+                        <i data-lucide="boxes" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-white/95 backdrop-blur rounded-xl p-3 sm:px-4 shadow-sm border border-amber-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Budget estimé</p>
+                        <p id="stat-total-price" class="font-display text-xl sm:text-2xl font-bold text-lego-blue">0 €</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-lg bg-blue-100 text-lego-blue flex items-center justify-center hidden sm:flex">
+                        <i data-lucide="piggy-bank" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-white/95 backdrop-blur rounded-xl p-3 sm:px-4 shadow-sm border border-amber-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Déjà réservés</p>
+                        <p id="stat-reserved-sets" class="font-display text-xl sm:text-2xl font-bold text-lego-green">0</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-lg bg-emerald-100 text-lego-green flex items-center justify-center hidden sm:flex">
+                        <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- BARRE D'ALERTE EXEMPLES (Si données démo actives) -->
+        <div id="demo-banner" class="hidden mb-6 bg-amber-50 border border-amber-300 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 text-sm text-amber-900">
+                <i data-lucide="sparkles" class="w-5 h-5 text-amber-600 shrink-0"></i>
+                <span>Votre liste contient actuellement <strong>3 sets d'exemple</strong> pour vous montrer le fonctionnement.</span>
+            </div>
+            <button onclick="clearDemoData()" class="text-xs font-semibold bg-amber-200/80 hover:bg-amber-300 text-amber-950 px-3 py-1.5 rounded-lg transition shrink-0">
+                Vider les exemples
+            </button>
+        </div>
+
+        <!-- BARRE DE FILTRES ET TRI -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 mb-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <!-- Recherche rapide -->
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="filter-search" oninput="renderSets()" placeholder="N° de set ou nom..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-lego-blue">
+                </div>
+
+                <!-- Filtre Occasion -->
+                <div>
+                    <select id="filter-occasion" onchange="renderSets()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-lego-blue">
+                        <option value="all">🎁 Toutes les occasions</option>
+                        <option value="Noël">🎄 Noël</option>
+                        <option value="Anniversaire">🎂 Anniversaire</option>
+                        <option value="Les deux">✨ Noël & Anniversaire</option>
+                    </select>
+                </div>
+
+                <!-- Filtre Gamme / Thème -->
+                <div>
+                    <select id="filter-theme" onchange="renderSets()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-lego-blue">
+                        <option value="all">🧱 Toutes les gammes</option>
+                        <option value="Star Wars">Star Wars</option>
+                        <option value="Batman">Batman</option>
+                        <option value="DC">DC</option>
+                        <option value="Marvel">Marvel</option>
+                        <option value="Simpsons">Simpsons</option>
+                        <option value="Scooby-Doo">Scooby-Doo</option>
+                        <option value="One Piece">One Piece</option>
+                        <option value="Friends">Friends</option>
+                        <option value="Icons">Icons</option>
+                        <option value="Technic">Technic</option>
+                        <option value="Harry Potter">Harry Potter</option>
+                        <option value="Ideas">Ideas</option>
+                        <option value="Architecture">Architecture</option>
+                        <option value="City">City</option>
+                        <option value="Creator">Creator 3-en-1</option>
+                        <option value="Speed Champions">Speed Champions</option>
+                        <option value="Botanical">Botanical Collection</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+
+                <!-- Budget Max -->
+                <div class="relative">
+                    <input type="number" id="filter-max-price" oninput="renderSets()" placeholder="Budget max (€)" min="0" class="w-full pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-lego-blue">
+                    <span class="text-slate-400 text-sm absolute right-3 top-1/2 -translate-y-1/2">€</span>
+                </div>
+
+                <!-- Tri -->
+                <div>
+                    <select id="sort-by" onchange="renderSets()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-lego-blue">
+                        <option value="priority">Trier : Priorité</option>
+                        <option value="price-asc">Prix : Croissant</option>
+                        <option value="price-desc">Prix : Décroissant</option>
+                        <option value="number">Numéro de set</option>
+                        <option value="newest">Ajout récent</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Options secondaires & Outils -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mt-3 pt-3 border-t border-slate-100 text-xs sm:text-sm">
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none text-slate-600 hover:text-slate-900">
+                    <input type="checkbox" id="filter-hide-reserved" onchange="renderSets()" class="rounded text-lego-blue focus:ring-lego-blue w-4 h-4">
+                    <span>Masquer les sets déjà réservés</span>
+                </label>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="openComparatorHelper()" class="text-lego-blue hover:underline font-medium flex items-center gap-1">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                        <span>Recherche rapide comparateurs</span>
+                    </button>
+                    <span class="text-slate-300">|</span>
+                    <button onclick="openBackupModal()" class="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1">
+                        <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                        <span>Sauvegarde JSON</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRILLE DES SETS LEGO -->
+        <div id="sets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Les cartes sont injectées ici par JavaScript -->
+        </div>
+
+        <!-- ÉTAT VIDE -->
+        <div id="empty-state" class="hidden bg-white rounded-2xl border-2 border-dashed border-slate-300 p-12 text-center my-6">
+            <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="package-open" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-display text-xl font-bold text-slate-800 mb-1">Aucun set LEGO trouvé</h3>
+            <p class="text-slate-500 text-sm max-w-md mx-auto mb-5">
+                Votre liste est vide ou aucun set ne correspond à vos filtres actuels.
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="resetFilters()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition">
+                    Réinitialiser les filtres
+                </button>
+                <button onclick="openSetModal()" class="px-4 py-2 bg-lego-red hover:bg-lego-redHover text-white font-medium rounded-xl text-sm transition flex items-center gap-1.5">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Ajouter un premier set
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-5 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+            <p>Ma Wishlist LEGO personnelle — Données stockées localement dans votre navigateur.</p>
+            <p>Liens comparateurs : Avenue de la Brique, Brickmitri & Planet-Brick.</p>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- MODALES                                                               -->
+    <!-- ===================================================================== -->
+
+    <!-- 1. MODALE AJOUT / ÉDITION D'UN SET -->
+    <div id="set-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden my-auto animate-fade-in">
+            <div class="bg-lego-yellow px-6 py-4 flex items-center justify-between border-b border-amber-300">
+                <h2 id="set-modal-title" class="font-display text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="plus-square" class="w-5 h-5 text-lego-red"></i>
+                    <span>Ajouter un set LEGO</span>
+                </h2>
+                <button onclick="closeModal('set-modal')" class="p-1.5 bg-white/60 hover:bg-white rounded-lg text-slate-700 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="set-form" onsubmit="saveSet(event)" class="p-6 space-y-4">
+                <input type="hidden" id="set-id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">N° du set *</label>
+                        <input type="text" id="set-number" required placeholder="ex: 10316" oninput="updateLiveComparatorLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nom du set *</label>
+                        <input type="text" id="set-name" required placeholder="ex: Le Seigneur des Anneaux : Fondcombe" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Aperçu rapide des comparateurs pendant l'ajout -->
+                <div id="live-comparator-bar" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span class="text-slate-600 font-medium">Vérifier le prix actuel :</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <a id="live-link-adlb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-lg transition">Avenue de la Brique ↗</a>
+                        <a id="live-link-bm" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-blue-100 hover:bg-blue-200 text-blue-900 font-semibold rounded-lg transition">Brickmitri ↗</a>
+                        <a id="live-link-pb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-semibold rounded-lg transition">Planet-Brick ↗</a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Gamme / Thème</label>
+                        <select id="set-theme" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            <option value="Star Wars">Star Wars</option>
+                        <option value="Batman">Batman</option>
+                        <option value="DC">DC</option>
+                        <option value="Marvel">Marvel</option>
+                        <option value="Simpsons">Simpsons</option>
+                        <option value="Scooby-Doo">Scooby-Doo</option>
+                        <option value="One Piece">One Piece</option>
+                        <option value="Friends">Friends</option>
+                            <option value="Icons">Icons</option>
+                            <option value="Technic">Technic</option>
+                            <option value="Harry Potter">Harry Potter</option>
+                            <option value="Ideas">Ideas</option>
+                            <option value="Architecture">Architecture</option>
+                            <option value="City">City</option>
+                            <option value="Creator">Creator 3-en-1</option>
+                            <option value="Speed Champions">Speed Champions</option>
+                            <option value="Botanical">Botanical Collection</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Prix estimé (€)</label>
+                        <input type="number" id="set-price" step="0.01" min="0" placeholder="ex: 499.99" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Priorité</label>
+                        <select id="set-priority" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            <option value="high">🔥 Coup de cœur (Haute)</option>
+                            <option value="medium" selected>⭐ Moyenne</option>
+                            <option value="low">💡 Idée bonus</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Occasion</label>
+                        <select id="set-occasion" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            <option value="Les deux">✨ Noël & Anniversaire</option>
+                            <option value="Noël">🎄 Noël</option>
+                            <option value="Anniversaire">🎂 Anniversaire</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-orange-200 bg-orange-50 cursor-pointer hover:bg-orange-100 transition">
+                        <input type="checkbox" id="set-retiring-soon" class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500">
+                        <span class="flex flex-col">
+                            <span class="text-sm font-bold text-orange-900">⏳ Bientôt retiré</span>
+                            <span class="text-xs text-orange-700">Alerte sur la carte</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-sky-200 bg-sky-50 cursor-pointer hover:bg-sky-100 transition">
+                        <input type="checkbox" id="set-new-release" class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500">
+                        <span class="flex flex-col">
+                            <span class="text-sm font-bold text-sky-900">✨ Nouveauté</span>
+                            <span class="text-xs text-sky-700">Set récemment sorti</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-300 bg-slate-100 cursor-pointer hover:bg-slate-200 transition">
+                        <input type="checkbox" id="set-retired" class="w-4 h-4 rounded text-slate-600 focus:ring-slate-500">
+                        <span class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-800">📦 Retiré du catalogue</span>
+                            <span class="text-xs text-slate-600">Set discontinué par LEGO</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-violet-200 bg-violet-50 cursor-pointer hover:bg-violet-100 transition">
+                        <input type="checkbox" id="set-exclusive" class="w-4 h-4 rounded text-violet-600 focus:ring-violet-500">
+                        <span class="flex flex-col">
+                            <span class="text-sm font-bold text-violet-900">💎 Exclusivité</span>
+                            <span class="text-xs text-violet-700">Set exclusif / édition spéciale</span>
+                        </span>
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">URL de l'image (Optionnel)</label>
+                    <input type="url" id="set-image" placeholder="https://... (laisser vide pour vignette automatique)" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Note personnelle / Astuce prix</label>
+                    <textarea id="set-note" rows="2" placeholder="ex: Souvent en promo chez Amazon ou Leclerc autour de 420 €..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('set-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition">
+                        Annuler
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-lego-red hover:bg-lego-redHover text-white font-semibold rounded-xl text-sm shadow-sm transition">
+                        Enregistrer le set
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. MODALE RÉSERVATION FAMILLE -->
+    <div id="reserve-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
+            <div class="bg-lego-green text-white px-6 py-4 flex items-center justify-between">
+                <h2 class="font-display text-lg font-bold flex items-center gap-2">
+                    <i data-lucide="gift" class="w-5 h-5"></i>
+                    <span>Offrir ce set LEGO</span>
+                </h2>
+                <button onclick="closeModal('reserve-modal')" class="p-1 bg-white/20 hover:bg-white/30 rounded-lg transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form onsubmit="confirmReservation(event)" class="p-6 space-y-4">
+                <input type="hidden" id="reserve-set-id">
+                <p id="reserve-set-info" class="text-sm text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200"></p>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Votre prénom (ou surnom) *</label>
+                    <input type="text" id="reserve-by-name" required placeholder="ex: Mamie, Tonton Lucas, Papa..." class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-green focus:outline-none">
+                </div>
+                <p class="text-xs text-slate-500">
+                    💡 Une fois réservé, le set sera marqué comme pris afin que personne d'autre ne l'achète en double. Pensez ensuite à renvoyer le lien mis à jour si vous êtes sur une liste partagée !
+                </p>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('reserve-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm">Annuler</button>
+                    <button type="submit" class="px-5 py-2 bg-lego-green hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm">Confirmer la réservation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. MODALE PARTAGE (URL SANS SERVEUR & TEXTE WHATSAPP/SMS) -->
+    <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden my-auto">
+            <div class="bg-lego-blue text-white px-6 py-4 flex items-center justify-between">
+                <h2 class="font-display text-xl font-bold flex items-center gap-2">
+                    <i data-lucide="share-2" class="w-5 h-5"></i>
+                    <span>Partager ma liste avec la famille</span>
+                </h2>
+                <button onclick="closeModal('share-modal')" class="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- Option A : Lien interactif encodé -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                            <i data-lucide="link" class="w-4 h-4 text-lego-blue"></i>
+                            <span>1. Lien interactif (Sans compte ni serveur)</span>
+                        </label>
+                        <span class="text-[11px] bg-blue-50 text-lego-blue font-semibold px-2 py-0.5 rounded-full">Recommandé</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-2">
+                        Toute votre liste est encodée directement dans ce lien. Votre famille ouvrira la page directement en <strong>Mode Famille</strong> avec les liens comparateurs.
+                    </p>
+                    <div class="flex gap-2">
+                        <input type="text" id="share-url-input" readonly class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono text-slate-600 focus:outline-none">
+                        <button onclick="copyToClipboard('share-url-input', 'Lien interactif copié !')" class="px-4 py-2 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl text-xs shrink-0 flex items-center gap-1.5 transition">
+                            <i data-lucide="copy" class="w-4 h-4"></i> Copier
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Option B : Résumé texte WhatsApp / SMS / Email -->
+                <div class="pt-4 border-t border-slate-100">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                            <i data-lucide="message-square" class="w-4 h-4 text-lego-green"></i>
+                            <span>2. Message prêt à envoyer (WhatsApp, SMS, Mail)</span>
+                        </label>
+                    </div>
+                    <textarea id="share-text-area" rows="7" readonly class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs font-sans text-slate-700 focus:outline-none"></textarea>
+                    <div class="flex justify-end mt-2">
+                        <button onclick="copyToClipboard('share-text-area', 'Message copié pour WhatsApp / SMS !')" class="px-4 py-2 bg-lego-green hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs flex items-center gap-1.5 transition">
+                            <i data-lucide="copy" class="w-4 h-4"></i> Copier le message
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. MODALE COMPARATEUR RAPIDE & EXPLICATION -->
+    <div id="comparator-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+                <h2 class="font-display text-lg font-bold flex items-center gap-2">
+                    <i data-lucide="search-check" class="w-5 h-5 text-lego-yellow"></i>
+                    <span>Comparateur de prix LEGO</span>
+                </h2>
+                <button onclick="closeModal('comparator-modal')" class="p-1 bg-white/10 hover:bg-white/20 rounded-lg transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p class="text-xs text-slate-600 bg-amber-50 border border-amber-200 p-3 rounded-xl">
+                    <strong>Note technique :</strong> Les sites comparateurs bloquent l'affichage direct dans une fenêtre intégrée (sécurité <em>X-Frame-Options</em>). Utilisez ces boutons d'accès direct qui lancent automatiquement la recherche du numéro de set.
+                </p>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Numéro de set à comparer</label>
+                    <input type="text" id="quick-comp-number" placeholder="ex: 75192" oninput="updateQuickCompModalLinks()" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-base font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                </div>
+                <div class="grid grid-cols-1 gap-2.5 pt-2">
+                    <a id="qcomp-adlb" href="https://www.avenuedelabrique.com" target="_blank" rel="noopener" class="flex items-center justify-between p-3.5 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100 transition">
+                        <div>
+                            <p class="font-bold text-sm text-amber-950">Avenue de la Brique</p>
+                            <p class="text-xs text-amber-800">Comparateur historique & historique des prix</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-4 h-4 text-amber-800"></i>
+                    </a>
+                    <a id="qcomp-bm" href="https://www.brickmitri.fr" target="_blank" rel="noopener" class="flex items-center justify-between p-3.5 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 transition">
+                        <div>
+                            <p class="font-bold text-sm text-blue-950">Brickmitri</p>
+                            <p class="text-xs text-blue-800">Suivi des stocks et alertes promos LEGO</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-4 h-4 text-blue-800"></i>
+                    </a>
+                    <a id="qcomp-pb" href="https://www.planet-brick.com" target="_blank" rel="noopener" class="flex items-center justify-between p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 transition">
+                        <div>
+                            <p class="font-bold text-sm text-emerald-950">Planet-Brick</p>
+                            <p class="text-xs text-emerald-800">Comparateur multi-boutiques européennes</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-4 h-4 text-emerald-800"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. MODALE SAUVEGARDE / IMPORT JSON -->
+    <div id="backup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
+            <div class="bg-slate-800 text-white px-6 py-4 flex items-center justify-between">
+                <h2 class="font-display text-lg font-bold">Sauvegarde & Restauration</h2>
+                <button onclick="closeModal('backup-modal')" class="p-1 bg-white/10 hover:bg-white/20 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4 text-sm">
+                <p class="text-slate-600 text-xs">
+                    Votre liste est enregistrée automatiquement dans votre navigateur. Vous pouvez aussi télécharger un fichier de sauvegarde sur votre appareil.
+                </p>
+                <button onclick="exportJSON()" class="w-full py-2.5 px-4 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition">
+                    <i data-lucide="download" class="w-4 h-4"></i> Télécharger ma liste (.json)
+                </button>
+                <div class="pt-3 border-t border-slate-200">
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-2">Importer un fichier (.json)</label>
+                    <input type="file" accept=".json" onchange="importJSON(event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. MODALE RENOMMER LA LISTE -->
+    <div id="title-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden">
+            <div class="bg-lego-yellow px-5 py-3.5 flex items-center justify-between">
+                <h2 class="font-display text-lg font-bold text-slate-900">Titre de ma liste</h2>
+                <button onclick="closeModal('title-modal')" class="p-1 bg-white/60 rounded-lg"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <form onsubmit="saveListTitle(event)" class="p-5 space-y-4">
+                <input type="text" id="list-title-input" required placeholder="ex: Liste LEGO de Thomas - Noël 2026" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('title-modal')" class="px-3 py-1.5 bg-slate-100 rounded-xl text-sm">Annuler</button>
+                    <button type="submit" class="px-4 py-1.5 bg-lego-blue text-white font-semibold rounded-xl text-sm">Valider</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT APPLICATIF -->
+    <script>
+        // =========================================================================
+        // ÉTAT DE L'APPLICATION & DONNÉES INITIALES
+        // =========================================================================
+        const STORAGE_KEY = 'lego_wishlist_data_v1';
+        let appState = {
+            title: 'Ma Wishlist LEGO',
+            sets: [],
+            isDemo: false
+        };
+        let currentMode = 'edit'; // 'edit' | 'family'
+        let isViewingSharedUrl = false;
+
+        // Sets d'exemple au premier lancement
+        const DEFAULT_DEMO_SETS = [
+            {
+                id: 'demo-1',
+                number: '10316',
+                name: 'Le Seigneur des Anneaux : Fondcombe',
+                theme: 'Icons',
+                price: 499.99,
+                priority: 'high',
+                occasion: 'Noël',
+                image: '',
+                note: 'Le set ultime ! Souvent en promo autour de 420-450 € sur Amazon ou Fnac.',
+                reservedBy: ''
+            },
+            {
+                id: 'demo-2',
+                number: '75355',
+                name: 'X-Wing Starfighter (UCS)',
+                theme: 'Star Wars',
+                price: 239.99,
+                priority: 'medium',
+                occasion: 'Anniversaire',
+                image: '',
+                note: 'Vérifier les offres sur Avenue de la Brique avant achat.',
+                reservedBy: ''
+            },
+            {
+                id: 'demo-3',
+                number: '21333',
+                name: 'Vincent van Gogh - La Nuit étoilée',
+                theme: 'Ideas',
+                price: 169.99,
+                priority: 'low',
+                occasion: 'Les deux',
+                image: '',
+                note: 'Superbe à accrocher au mur.',
+                reservedBy: 'Mamie'
+            }
+        ];
+
+        // =========================================================================
+        // INITIALISATION
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            loadInitialData();
+            lucide.createIcons();
+            updateModeUI();
+            renderSets();
+        });
+
+        function loadInitialData() {
+            // 1. Vérifier si un hash de partage est présent dans l'URL (#list=...)
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#list=')) {
+                try {
+                    const encoded = hash.substring(6);
+                    const decodedJson = decodeURIComponent(escape(atob(encoded)));
+                    const parsed = JSON.parse(decodedJson);
+                    if (parsed && Array.isArray(parsed.sets)) {
+                        appState.title = parsed.title || 'Wishlist LEGO partagée';
+                        appState.sets = parsed.sets;
+                        appState.isDemo = false;
+                        isViewingSharedUrl = true;
+                        currentMode = 'family'; // Bascule auto en mode famille
+                        document.getElementById('shared-banner').classList.remove('hidden');
+                        document.getElementById('list-title-display').textContent = appState.title;
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Erreur lecture lien partagé:', e);
+                    showToast('Le lien partagé semble invalide ou incomplet.', 'error');
+                }
+            }
+
+            // 2. Sinon charger depuis localStorage
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appState = {
+                        title: parsed.title || 'Ma Wishlist LEGO',
+                        sets: Array.isArray(parsed.sets) ? parsed.sets : [],
+                        isDemo: Boolean(parsed.isDemo)
+                    };
+                } catch (e) {
+                    appState.sets = [...DEFAULT_DEMO_SETS];
+                    appState.isDemo = true;
+                }
+            } else {
+                // Premier lancement : pré-remplir avec les exemples
+                appState.sets = [...DEFAULT_DEMO_SETS];
+                appState.isDemo = true;
+                saveToLocalStorage();
+            }
+
+            document.getElementById('list-title-display').textContent = appState.title;
+            updateDemoBanner();
+        }
+
+        function saveToLocalStorage() {
+            if (!isViewingSharedUrl) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            }
+            updateDemoBanner();
+        }
+
+        function importSharedToLocal() {
+            isViewingSharedUrl = false;
+            saveToLocalStorage();
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            document.getElementById('shared-banner').classList.add('hidden');
+            setMode('edit');
+            showToast('Liste sauvegardée sur votre appareil !', 'success');
+        }
+
+        function clearDemoData() {
+            appState.sets = [];
+            appState.isDemo = false;
+            saveToLocalStorage();
+            renderSets();
+            showToast('Les sets d\'exemple ont été supprimés.', 'info');
+        }
+
+        function updateDemoBanner() {
+            const banner = document.getElementById('demo-banner');
+            if (appState.isDemo && !isViewingSharedUrl && appState.sets.length > 0) {
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        // =========================================================================
+        // GESTION DES MODES (MOI vs FAMILLE)
+        // =========================================================================
+        function setMode(mode) {
+            currentMode = mode;
+            updateModeUI();
+            renderSets();
+        }
+
+        function updateModeUI() {
+            const editBtn = document.getElementById('mode-edit-btn');
+            const familyBtn = document.getElementById('mode-family-btn');
+            const addBtn = document.getElementById('add-set-btn');
+            const editTitleBtn = document.getElementById('edit-title-btn');
+
+            if (currentMode === 'edit') {
+                editBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition bg-slate-900 text-white shadow-sm';
+                familyBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition text-slate-600 hover:text-slate-900';
+                addBtn.classList.remove('hidden');
+                editTitleBtn.classList.remove('hidden');
+            } else {
+                familyBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition bg-lego-green text-white shadow-sm';
+                editBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition text-slate-600 hover:text-slate-900';
+                addBtn.classList.add('hidden');
+                editTitleBtn.classList.add('hidden');
+            }
+        }
+
+        // =========================================================================
+        // LIENS COMPARATEURS DE PRIX
+        // =========================================================================
+        function getComparatorUrls(setNumber) {
+            const cleanNum = encodeURIComponent(String(setNumber).trim());
+            return {
+                avenue: `https://www.avenuedelabrique.com/recherche?q=${cleanNum}`,
+                brickmitri: `https://www.brickmitri.fr/recherche?q=${cleanNum}`,
+                planet: `https://www.planet-brick.com/recherche?controller=search&s=${cleanNum}`
+            };
+        }
+
+        function updateLiveComparatorLinks() {
+            const num = document.getElementById('set-number').value.trim();
+            const bar = document.getElementById('live-comparator-bar');
+            if (num.length >= 3) {
+                const urls = getComparatorUrls(num);
+                document.getElementById('live-link-adlb').href = urls.avenue;
+                document.getElementById('live-link-bm').href = urls.brickmitri;
+                document.getElementById('live-link-pb').href = urls.planet;
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        function openComparatorHelper(prefillNumber = '') {
+            const input = document.getElementById('quick-comp-number');
+            input.value = prefillNumber;
+            updateQuickCompModalLinks();
+            openModal('comparator-modal');
+        }
+
+        function updateQuickCompModalLinks() {
+            const num = document.getElementById('quick-comp-number').value.trim();
+            const urls = num ? getComparatorUrls(num) : {
+                avenue: 'https://www.avenuedelabrique.com',
+                brickmitri: 'https://www.brickmitri.fr',
+                planet: 'https://www.planet-brick.com'
+            };
+            document.getElementById('qcomp-adlb').href = urls.avenue;
+            document.getElementById('qcomp-bm').href = urls.brickmitri;
+            document.getElementById('qcomp-pb').href = urls.planet;
+        }
+
+        // =========================================================================
+        // RENDU DE LA GRILLE ET STATISTIQUES
+        // =========================================================================
+        function renderSets() {
+            const grid = document.getElementById('sets-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            // Récupérer filtres
+            const searchQuery = document.getElementById('filter-search').value.toLowerCase().trim();
+            const occasionFilter = document.getElementById('filter-occasion').value;
+            const themeFilter = document.getElementById('filter-theme').value;
+            const maxPrice = parseFloat(document.getElementById('filter-max-price').value);
+            const hideReserved = document.getElementById('filter-hide-reserved').checked;
+            const sortBy = document.getElementById('sort-by').value;
+
+            // Filtrer
+            let filtered = appState.sets.filter(set => {
+                if (searchQuery && !set.number.toLowerCase().includes(searchQuery) && !set.name.toLowerCase().includes(searchQuery)) {
+                    return false;
+                }
+                if (occasionFilter !== 'all' && set.occasion !== occasionFilter && set.occasion !== 'Les deux') {
+                    return false;
+                }
+                if (themeFilter !== 'all' && set.theme !== themeFilter) {
+                    return false;
+                }
+                if (!isNaN(maxPrice) && maxPrice > 0 && (set.price || 0) > maxPrice) {
+                    return false;
+                }
+                if (hideReserved && set.reservedBy) {
+                    return false;
+                }
+                return true;
+            });
+
+            // Trier
+            const priorityWeight = { high: 3, medium: 2, low: 1 };
+            filtered.sort((a, b) => {
+                if (sortBy === 'priority') {
+                    return (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0);
+                }
+                if (sortBy === 'price-asc') {
+                    return (a.price || 0) - (b.price || 0);
+                }
+                if (sortBy === 'price-desc') {
+                    return (b.price || 0) - (a.price || 0);
+                }
+                if (sortBy === 'number') {
+                    return String(a.number).localeCompare(String(b.number), undefined, { numeric: true });
+                }
+                return 0;
+            });
+
+            // Mettre à jour les statistiques globales
+            updateStats();
+
+            // Affichage
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(set => createSetCardHTML(set)).join('');
+            lucide.createIcons();
+        }
+
+        function updateStats() {
+            const total = appState.sets.length;
+            const totalPrice = appState.sets.reduce((acc, s) => acc + (parseFloat(s.price) || 0), 0);
+            const reserved = appState.sets.filter(s => Boolean(s.reservedBy)).length;
+
+            document.getElementById('stat-total-sets').textContent = total;
+            document.getElementById('stat-total-price').textContent = totalPrice.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €';
+            document.getElementById('stat-reserved-sets').textContent = `${reserved} / ${total}`;
+        }
+
+        function getThemeBadgeColor(theme) {
+            const map = {
+                'Star Wars': 'bg-slate-900 text-amber-400',
+                'Icons': 'bg-amber-100 text-amber-900',
+                'Technic': 'bg-orange-100 text-orange-800',
+                'Harry Potter': 'bg-purple-100 text-purple-900',
+                'Ideas': 'bg-yellow-100 text-yellow-900',
+                'Architecture': 'bg-stone-200 text-stone-800',
+                'City': 'bg-sky-100 text-sky-900',
+                'Speed Champions': 'bg-red-100 text-red-800',
+                'Botanical': 'bg-emerald-100 text-emerald-900'
+            };
+            return map[theme] || 'bg-blue-100 text-blue-900';
+        }
+
+        function getPriorityBadge(priority) {
+            if (priority === 'high') {
+                return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-lego-red">🔥 Coup de cœur</span>`;
+            }
+            if (priority === 'low') {
+                return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">💡 Idée bonus</span>`;
+            }
+            return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">⭐ Souhaité</span>`;
+        }
+
+        function createSetCardHTML(set) {
+            const urls = getComparatorUrls(set.number);
+            const isReserved = Boolean(set.reservedBy);
+            const priceFormatted = set.price ? `${parseFloat(set.price).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €` : 'Prix non défini';
+
+            // Vignette visuelle (Image custom ou belle illustration SVG LEGO générée avec numéro)
+            const visualHeader = set.image
+                ? `<img src="${escapeHTML(set.image)}" alt="LEGO ${escapeHTML(set.number)}" onerror="this.onerror=null;this.parentElement.innerHTML=generateLegoPlaceholderSVG('${escapeHTML(set.number)}', '${escapeHTML(set.theme)}')" class="w-full h-44 object-contain bg-white p-3">`
+                : generateLegoPlaceholderSVG(set.number, set.theme);
+
+            // Actions bas de carte selon le mode (Moi vs Famille)
+            let footerActions = '';
+            if (currentMode === 'edit') {
+                footerActions = `
+                    <div class="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                        <button onclick="${isReserved ? `cancelReservation('${set.id}')` : `openReserveModal('${set.id}')`}" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1.5 ${isReserved ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+                            <i data-lucide="${isReserved ? 'check-circle' : 'gift'}" class="w-3.5 h-3.5"></i>
+                            <span>${isReserved ? `Réservé (${escapeHTML(set.reservedBy)})` : 'Marquer réservé'}</span>
+                        </button>
+                        <div class="flex items-center gap-1">
+                            <button onclick="openSetModal('${set.id}')" title="Modifier" class="p-2 text-slate-500 hover:text-lego-blue hover:bg-blue-50 rounded-lg transition">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteSet('${set.id}')" title="Supprimer" class="p-2 text-slate-500 hover:text-lego-red hover:bg-red-50 rounded-lg transition">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Mode Famille
+                if (isReserved) {
+                    footerActions = `
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl w-full justify-between">
+                                <span class="text-xs font-bold flex items-center gap-1.5">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-lego-green shrink-0"></i>
+                                    Réservé par ${escapeHTML(set.reservedBy)}
+                                </span>
+                                <button onclick="cancelReservation('${set.id}')" class="text-[11px] underline text-emerald-700 hover:text-emerald-950">Annuler</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    footerActions = `
+                        <div class="pt-3 border-t border-slate-100">
+                            <button onclick="openReserveModal('${set.id}')" class="w-full py-2.5 px-4 bg-lego-green hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm shadow-sm transition flex items-center justify-center gap-2">
+                                <i data-lucide="gift" class="w-4 h-4"></i>
+                                <span>Offrir ce set (Réserver)</span>
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            return `
+                <article class="bg-white rounded-2xl shadow-sm border ${isReserved ? 'border-emerald-300 ring-2 ring-emerald-500/10' : 'border-slate-200/90'} overflow-hidden flex flex-col card-hover relative">
+                    <div class="absolute top-3 right-3 z-10 flex flex-col items-end gap-1.5">
+                        ${set.retiringSoon ? `<span class="bg-orange-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">⏳ Bientôt retiré</span>` : ''}
+                        ${set.isNew ? `<span class="bg-sky-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">✨ Nouveauté</span>` : ''}
+                        ${set.retired ? `<span class="bg-slate-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">📦 Retiré du catalogue</span>` : ''}
+                        ${set.exclusive ? `<span class="bg-violet-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">💎 Exclusivité</span>` : ''}
+                        ${isReserved ? `<span class="bg-lego-green text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">✓ Déjà pris</span>` : ''}
+                    </div>
+
+                    <!-- Zone Visuelle / Vignette -->
+                    <div class="relative border-b border-slate-100 bg-slate-50/70">
+                        ${visualHeader}
+                        <span class="absolute top-3 left-3 bg-slate-900/90 text-white font-mono text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm">
+                            #${escapeHTML(set.number)}
+                        </span>
+                    </div>
+
+                    <!-- Corps de la carte -->
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <!-- Badges Gamme & Priorité -->
+                            <div class="flex flex-wrap items-center gap-1.5 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${getThemeBadgeColor(set.theme)}">
+                                    ${escapeHTML(set.theme)}
+                                </span>
+                                ${getPriorityBadge(set.priority)}
+                                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                    ${set.occasion === 'Noël' ? '🎄 Noël' : set.occasion === 'Anniversaire' ? '🎂 Anniv.' : '✨ Noël/Anniv.'}
+                                </span>
+                            </div>
+
+                            <!-- Titre & Prix -->
+                            <h3 class="font-display text-lg font-bold text-slate-900 leading-snug mb-1">
+                                ${escapeHTML(set.name)}
+                            </h3>
+                            <p class="text-xl font-bold text-lego-blue">
+                                ${priceFormatted}
+                            </p>
+
+                            <!-- Note personnelle -->
+                            ${set.note ? `
+                                <p class="mt-2.5 text-xs text-slate-600 bg-slate-50 border border-slate-200/70 rounded-xl p-2.5 italic">
+                                    "${escapeHTML(set.note)}"
+                                </p>
+                            ` : ''}
+                        </div>
+
+                        <!-- Comparateurs de Prix -->
+                        <div class="space-y-2">
+                            <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-200/70">
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center justify-between">
+                                    <span>Comparer les prix :</span>
+                                    <button onclick="openComparatorHelper('${escapeHTML(set.number)}')" class="text-lego-blue hover:underline lowercase font-medium">infos</button>
+                                </p>
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <a href="${urls.avenue}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-amber-100/80 hover:bg-amber-200 text-amber-950 font-semibold rounded-lg text-[11px] transition truncate" title="Voir sur Avenue de la Brique">
+                                        Av. Brique ↗
+                                    </a>
+                                    <a href="${urls.brickmitri}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-blue-100/80 hover:bg-blue-200 text-blue-950 font-semibold rounded-lg text-[11px] transition truncate" title="Voir sur Brickmitri">
+                                        Brickmitri ↗
+                                    </a>
+                                    <a href="${urls.planet}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-emerald-100/80 hover:bg-emerald-200 text-emerald-950 font-semibold rounded-lg text-[11px] transition truncate" title="Voir sur Planet-Brick">
+                                        Planet-Brick ↗
+                                    </a>
+                                </div>
+                            </div>
+
+                            ${footerActions}
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function generateLegoPlaceholderSVG(number, theme) {
+            return `
+                <div class="w-full h-44 bg-gradient-to-br from-amber-50 via-yellow-50 to-slate-100 flex flex-col items-center justify-center p-4 select-none">
+                    <svg class="w-16 h-12 text-lego-yellow drop-shadow-sm mb-2" viewBox="0 0 80 56" fill="none">
+                        <rect x="14" y="4" width="18" height="8" rx="2" fill="#EAB308"/>
+                        <rect x="48" y="4" width="18" height="8" rx="2" fill="#EAB308"/>
+                        <rect x="6" y="12" width="68" height="38" rx="6" fill="#FFCF00" stroke="#EAB308" stroke-width="2"/>
+                        <circle cx="24" cy="31" r="4" fill="#FEF08A"/>
+                        <circle cx="56" cy="31" r="4" fill="#FEF08A"/>
+                    </svg>
+                    <span class="font-mono font-bold text-lg text-slate-800 tracking-wider">SET ${escapeHTML(number)}</span>
+                    <span class="text-[11px] font-medium text-slate-500 uppercase tracking-widest">${escapeHTML(theme || 'LEGO')}</span>
+                </div>
+            `;
+        }
+
+        // =========================================================================
+        // CRUD : AJOUT, MODIFICATION, SUPPRESSION, RÉSERVATION
+        // =========================================================================
+        function openSetModal(setId = null) {
+            const form = document.getElementById('set-form');
+            form.reset();
+            document.getElementById('set-id').value = '';
+            document.getElementById('live-comparator-bar').classList.add('hidden');
+
+            if (setId) {
+                const set = appState.sets.find(s => s.id === setId);
+                if (!set) return;
+                document.getElementById('set-modal-title').innerHTML = `<i data-lucide="pencil" class="w-5 h-5 text-lego-blue"></i><span>Modifier le set #${escapeHTML(set.number)}</span>`;
+                document.getElementById('set-id').value = set.id;
+                document.getElementById('set-number').value = set.number;
+                document.getElementById('set-name').value = set.name;
+                document.getElementById('set-theme').value = set.theme;
+                document.getElementById('set-price').value = set.price || '';
+                document.getElementById('set-priority').value = set.priority || 'medium';
+                document.getElementById('set-occasion').value = set.occasion || 'Les deux';
+                document.getElementById('set-image').value = set.image || '';
+                document.getElementById('set-note').value = set.note || '';
+                document.getElementById('set-retiring-soon').checked = Boolean(set.retiringSoon);
+                document.getElementById('set-new-release').checked = Boolean(set.isNew);
+                document.getElementById('set-retired').checked = Boolean(set.retired);
+                document.getElementById('set-exclusive').checked = Boolean(set.exclusive);
+                updateLiveComparatorLinks();
+            } else {
+                document.getElementById('set-modal-title').innerHTML = `<i data-lucide="plus-square" class="w-5 h-5 text-lego-red"></i><span>Ajouter un set LEGO</span>`;
+            }
+
+            openModal('set-modal');
+            lucide.createIcons();
+        }
+
+        function saveSet(event) {
+            event.preventDefault();
+            const id = document.getElementById('set-id').value;
+            const number = document.getElementById('set-number').value.trim();
+            const name = document.getElementById('set-name').value.trim();
+            const theme = document.getElementById('set-theme').value;
+            const priceVal = parseFloat(document.getElementById('set-price').value);
+            const price = isNaN(priceVal) ? null : priceVal;
+            const priority = document.getElementById('set-priority').value;
+            const occasion = document.getElementById('set-occasion').value;
+            const image = document.getElementById('set-image').value.trim();
+            const note = document.getElementById('set-note').value.trim();
+            const retiringSoon = document.getElementById('set-retiring-soon').checked;
+            const isNew = document.getElementById('set-new-release').checked;
+            const retired = document.getElementById('set-retired').checked;
+            const exclusive = document.getElementById('set-exclusive').checked;
+
+            if (!number || !name) return;
+
+            if (id) {
+                const index = appState.sets.findIndex(s => s.id === id);
+                if (index !== -1) {
+                    appState.sets[index] = {
+                        ...appState.sets[index],
+                        number, name, theme, price, priority, occasion, image, note,
+                        retiringSoon, isNew, retired, exclusive
+                    };
+                    showToast(`Set #${number} mis à jour !`, 'success');
+                }
+            } else {
+                const newSet = {
+                    id: 'set-' + Date.now(),
+                    number, name, theme, price, priority, occasion, image, note,
+                    retiringSoon, isNew, retired, exclusive,
+                    reservedBy: ''
+                };
+                appState.sets.unshift(newSet);
+                appState.isDemo = false;
+                showToast(`Set #${number} ajouté à votre wishlist !`, 'success');
+            }
+
+            saveToLocalStorage();
+            closeModal('set-modal');
+            renderSets();
+        }
+
+        function deleteSet(setId) {
+            const set = appState.sets.find(s => s.id === setId);
+            if (!set) return;
+            appState.sets = appState.sets.filter(s => s.id !== setId);
+            saveToLocalStorage();
+            renderSets();
+            showToast(`Set #${set.number} supprimé.`, 'info');
+        }
+
+        // Réservation Famille
+        function openReserveModal(setId) {
+            const set = appState.sets.find(s => s.id === setId);
+            if (!set) return;
+            document.getElementById('reserve-set-id').value = set.id;
+            document.getElementById('reserve-by-name').value = '';
+            document.getElementById('reserve-set-info').innerHTML = `Vous souhaitez réserver le set <strong>#${escapeHTML(set.number)} - ${escapeHTML(set.name)}</strong>.`;
+            openModal('reserve-modal');
+        }
+
+        function confirmReservation(event) {
+            event.preventDefault();
+            const id = document.getElementById('reserve-set-id').value;
+            const name = document.getElementById('reserve-by-name').value.trim();
+            if (!name) return;
+
+            const set = appState.sets.find(s => s.id === id);
+            if (set) {
+                set.reservedBy = name;
+                saveToLocalStorage();
+                renderSets();
+                closeModal('reserve-modal');
+                showToast(`Merci ${name} ! Le set #${set.number} est réservé.`, 'success');
+
+                // Si l'utilisateur consulte un lien partagé, on lui propose de copier le nouveau lien à jour
+                if (isViewingSharedUrl) {
+                    setTimeout(() => openShareModal(), 600);
+                }
+            }
+        }
+
+        function cancelReservation(setId) {
+            const set = appState.sets.find(s => s.id === setId);
+            if (set) {
+                set.reservedBy = '';
+                saveToLocalStorage();
+                renderSets();
+                showToast(`Réservation annulée pour le set #${set.number}.`, 'info');
+            }
+        }
+
+        // =========================================================================
+        // PARTAGE SANS SERVEUR (URL BASE64 & TEXTE WHATSAPP/SMS)
+        // =========================================================================
+        function openShareModal() {
+            // 1. Générer l'URL encodée
+            const payload = {
+                title: appState.title,
+                sets: appState.sets
+            };
+            const jsonStr = JSON.stringify(payload);
+            const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+            // IMPORTANT : utiliser l'URL de l'application hébergée (GitHub Pages),
+            // et non l'URL googleusercontent de l'iframe Google Sites.
+            // Comme le fichier est chargé depuis GitHub Pages, window.location pointe
+            // sur GitHub Pages même lorsque la wishlist est intégrée dans Google Sites.
+            const baseUrl = window.location.origin + window.location.pathname + window.location.search;
+            const shareUrl = `${baseUrl}#list=${encoded}`;
+            document.getElementById('share-url-input').value = shareUrl;
+
+            // 2. Générer le résumé texte formaté
+            let lines = [`🧱 *${appState.title}* 🎁\n`];
+            if (appState.sets.length === 0) {
+                lines.push('Ma liste est encore vide !');
+            } else {
+                appState.sets.forEach(s => {
+                    const status = s.reservedBy ? `✅ [Réservé par ${s.reservedBy}]` : '⬜ Disponible';
+                    const priceTxt = s.price ? ` (~${s.price} €)` : '';
+                    const urls = getComparatorUrls(s.number);
+                    lines.push(`${status} *LEGO ${s.number}* - ${s.name}${priceTxt}`);
+                    lines.push(`   👉 Comparer les prix : ${urls.avenue}\n`);
+                });
+            }
+            document.getElementById('share-text-area').value = lines.join('\n');
+
+            openModal('share-modal');
+        }
+
+        function copyToClipboard(elementId, successMsg) {
+            const el = document.getElementById(elementId);
+            el.select();
+            el.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                showToast(successMsg, 'success');
+            } catch (err) {
+                showToast('Impossible de copier automatiquement. Sélectionnez le texte manuellement.', 'error');
+            }
+        }
+
+        // =========================================================================
+        // EXPORT / IMPORT JSON & TITRE
+        // =========================================================================
+        function openBackupModal() {
+            openModal('backup-modal');
+        }
+
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `wishlist-lego-${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('Fichier de sauvegarde téléchargé !', 'success');
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && Array.isArray(imported.sets)) {
+                        appState.title = imported.title || 'Ma Wishlist LEGO';
+                        appState.sets = imported.sets;
+                        appState.isDemo = false;
+                        isViewingSharedUrl = false;
+                        saveToLocalStorage();
+                        document.getElementById('list-title-display').textContent = appState.title;
+                        renderSets();
+                        closeModal('backup-modal');
+                        showToast('Liste importée avec succès !', 'success');
+                    } else {
+                        showToast('Format de fichier JSON invalide.', 'error');
+                    }
+                } catch (err) {
+                    showToast('Erreur lors de la lecture du fichier.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function openTitleModal() {
+            document.getElementById('list-title-input').value = appState.title;
+            openModal('title-modal');
+        }
+
+        function saveListTitle(event) {
+            event.preventDefault();
+            const newTitle = document.getElementById('list-title-input').value.trim();
+            if (newTitle) {
+                appState.title = newTitle;
+                document.getElementById('list-title-display').textContent = newTitle;
+                saveToLocalStorage();
+                closeModal('title-modal');
+                showToast('Titre mis à jour !', 'success');
+            }
+        }
+
+        // =========================================================================
+        // UTILITAIRES UI (MODALES, FILTRES, TOASTS)
+        // =========================================================================
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-search').value = '';
+            document.getElementById('filter-occasion').value = 'all';
+            document.getElementById('filter-theme').value = 'all';
+            document.getElementById('filter-max-price').value = '';
+            document.getElementById('filter-hide-reserved').checked = false;
+            document.getElementById('sort-by').value = 'priority';
+            renderSets();
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-slate-900 text-white border-l-4 border-lego-green',
+                error: 'bg-red-900 text-white border-l-4 border-lego-red',
+                info: 'bg-slate-800 text-white border-l-4 border-lego-yellow'
+            };
+            toast.className = `${colors[type] || colors.info} px-4 py-3 rounded-xl shadow-lg text-xs sm:text-sm font-medium flex items-center gap-2.5 pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<span>${escapeHTML(message)}</span>`;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
