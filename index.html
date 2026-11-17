@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Wishlist LEGO | Noël & Anniversaire</title>
+    <title>Ma Wishlist LEGO & MOCs | Noël & Anniversaire</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter & Fredoka -->
@@ -94,7 +94,7 @@
                             </button>
                         </div>
                         <p class="text-slate-800/80 text-xs sm:text-sm font-medium">
-                            Idées cadeaux Noël & Anniversaire • Comparateurs, Lots & Rebrickable intégrés
+                            Idées cadeaux Noël & Anniversaire • Sets, Lots, MOCs & Comparateurs intégrés
                         </p>
                     </div>
                 </div>
@@ -120,11 +120,30 @@
                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                         <span>Ajouter un set / lot</span>
                     </button>
+
+                    <button id="add-moc-btn" onclick="openMocModal()" class="hidden bg-purple-700 hover:bg-purple-800 text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 text-sm">
+                        <i data-lucide="puzzle" class="w-4 h-4"></i>
+                        <span>Ajouter un MOC</span>
+                    </button>
                 </div>
             </div>
 
+            <!-- NAVIGATION ENTRE LES PAGES (WISHLIST SETS vs PAGE MOCs) -->
+            <div class="flex items-center gap-2 mt-5 border-b border-amber-500/30 pb-3">
+                <button id="tab-sets-btn" onclick="switchPage('sets')" class="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition bg-slate-900 text-white shadow-sm">
+                    <i data-lucide="boxes" class="w-4 h-4 text-lego-yellow"></i>
+                    <span>Wishlist Sets & Lots</span>
+                    <span id="tab-sets-count" class="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+                <button id="tab-mocs-btn" onclick="switchPage('mocs')" class="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition bg-white/80 hover:bg-white text-slate-800">
+                    <i data-lucide="puzzle" class="w-4 h-4 text-purple-600"></i>
+                    <span>Mes MOCs (Créations)</span>
+                    <span id="tab-mocs-count" class="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+            </div>
+
             <!-- BARRE DE STATISTIQUES -->
-            <div class="grid grid-cols-3 gap-3 mt-5">
+            <div id="stats-sets-bar" class="grid grid-cols-3 gap-3 mt-4">
                 <div class="bg-white/95 backdrop-blur rounded-xl p-3 sm:px-4 shadow-sm border border-amber-200/80 flex items-center justify-between">
                     <div>
                         <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Sets / Lots souhaités</p>
@@ -153,11 +172,44 @@
                     </div>
                 </div>
             </div>
+
+            <!-- BARRE DE STATISTIQUES PAGE MOCs -->
+            <div id="stats-mocs-bar" class="hidden grid-cols-3 gap-3 mt-4">
+                <div class="bg-white/95 backdrop-blur rounded-xl p-3 sm:px-4 shadow-sm border border-purple-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">MOCs enregistrés</p>
+                        <p id="stat-total-mocs" class="font-display text-xl sm:text-2xl font-bold text-purple-900">0</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center hidden sm:flex">
+                        <i data-lucide="puzzle" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-white/95 backdrop-blur rounded-xl p-3 sm:px-4 shadow-sm border border-purple-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Sets requis au total</p>
+                        <p id="stat-mocs-sets-count" class="font-display text-xl sm:text-2xl font-bold text-lego-blue">0</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-lg bg-blue-100 text-lego-blue flex items-center justify-center hidden sm:flex">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="bg-white/95 backdrop-blur rounded-xl p-3 sm:px-4 shadow-sm border border-purple-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Budget total MOCs</p>
+                        <p id="stat-mocs-total-price" class="font-display text-xl sm:text-2xl font-bold text-emerald-700">0 €</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center hidden sm:flex">
+                        <i data-lucide="calculator" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- CONTENU PRINCIPAL -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- ===================================================================== -->
+    <!-- PAGE 1 : WISHLIST SETS & LOTS                                         -->
+    <!-- ===================================================================== -->
+    <main id="page-sets" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         <div id="demo-banner" class="hidden mb-6 bg-amber-50 border border-amber-300 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div class="flex items-center gap-2.5 text-sm text-amber-900">
@@ -280,11 +332,48 @@
         </div>
     </main>
 
+    <!-- ===================================================================== -->
+    <!-- PAGE 2 : MES MOCs (CRÉATIONS ALTERNATIVES & LISTE DES SETS REQUIS)    -->
+    <!-- ===================================================================== -->
+    <main id="page-mocs" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start sm:items-center gap-3">
+                <div class="w-10 h-10 bg-purple-600 text-white rounded-xl flex items-center justify-center shrink-0">
+                    <i data-lucide="puzzle" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h2 class="font-display text-lg font-bold text-purple-950">Mes MOCs & Constructions alternatives</h2>
+                    <p class="text-xs text-purple-800">Associe chaque MOC Rebrickable à la liste des boîtes LEGO nécessaires pour le construire, et ajoute les sets manquants à ta wishlist en un clic.</p>
+                </div>
+            </div>
+            <button id="add-moc-banner-btn" onclick="openMocModal()" class="bg-purple-700 hover:bg-purple-800 text-white font-semibold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Nouveau MOC
+            </button>
+        </div>
+
+        <!-- GRILLE DES MOCs -->
+        <div id="mocs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+        <!-- ÉTAT VIDE MOCs -->
+        <div id="mocs-empty-state" class="hidden bg-white rounded-2xl border-2 border-dashed border-purple-200 p-12 text-center my-6">
+            <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="puzzle" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-display text-xl font-bold text-slate-800 mb-1">Aucun MOC enregistré</h3>
+            <p class="text-slate-500 text-sm max-w-md mx-auto mb-5">
+                Ajoute une création Rebrickable (ex: <span class="font-mono font-semibold">MOC-123456</span>) et liste les sets nécessaires pour la fabriquer.
+            </p>
+            <button onclick="openMocModal()" class="px-5 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl text-sm transition inline-flex items-center gap-2">
+                <i data-lucide="plus" class="w-4 h-4"></i> Ajouter mon premier MOC
+            </button>
+        </div>
+    </main>
+
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 py-5 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-            <p>Ma Wishlist LEGO personnelle — Synchronisation Supabase & Recherche Rebrickable.</p>
-            <p>Comparateurs : Avenue de la Brique, Brickmitri.com, Planet-Brick, Leboncoin, Vinted & Dealabs.</p>
+            <p>Ma Wishlist LEGO & MOCs — Synchronisation Supabase & Recherche Rebrickable.</p>
+            <p>Comparateurs : Avenue de la Brique, Brickmitri.com, Planet-Brick, Dealabs, Leboncoin & Vinted.</p>
         </div>
     </footer>
 
@@ -317,7 +406,7 @@
                     </label>
                     <div class="flex gap-2">
                         <div class="relative flex-1">
-                            <input type="text" id="rb-search-input" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchRebrickable();}" placeholder="Ex: 76341, Simpsons, Arkham Asylum..." class="w-full pl-3 pr-8 py-2 bg-white border border-blue-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            <input type="text" id="rb-search-input" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchRebrickable();}" placeholder="Ex: 76300, Arkham Asylum, Simpsons..." class="w-full pl-3 pr-8 py-2 bg-white border border-blue-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
                             <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2"></i>
                         </div>
                         <button type="button" onclick="searchRebrickable()" class="px-4 py-2 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl text-xs sm:text-sm transition shrink-0">
@@ -354,21 +443,43 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">N° du set (ou lot) *</label>
-                            <input type="text" id="set-number" required placeholder="ex: 76341" oninput="handleSetNumberInput()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            <input type="text" id="set-number" required placeholder="ex: 76300" oninput="handleSetNumberInput()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nom du set ou du lot *</label>
-                            <input type="text" id="set-name" required placeholder="ex: Groot en tenue de Ravageur" oninput="updateLiveComparatorLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            <input type="text" id="set-name" required placeholder="ex: Arkham Asylum" oninput="updateLiveComparatorLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
                         </div>
                     </div>
 
-                    <!-- Aperçu rapide des comparateurs pendant l'ajout -->
+                    <!-- Aperçu rapide des comparateurs + lien direct fiche Rebrickable -->
                     <div id="live-comparator-bar" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-                        <span class="text-slate-600 font-medium">Tester les comparateurs :</span>
+                        <a id="live-link-rb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg transition">Fiche Rebrickable ↗</a>
                         <div class="flex flex-wrap gap-1.5">
-                            <a id="live-link-adlb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-lg transition">Avenue de la Brique ↗</a>
+                            <a id="live-link-adlb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-lg transition">Av. Brique ↗</a>
                             <a id="live-link-bm" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-blue-100 hover:bg-blue-200 text-blue-900 font-semibold rounded-lg transition">Brickmitri ↗</a>
                             <a id="live-link-pb" href="#" target="_blank" rel="noopener" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-semibold rounded-lg transition">Planet-Brick ↗</a>
+                        </div>
+                    </div>
+
+                    <!-- IMPORT RAPIDE DES DATES DE SORTIE / RETRAIT DEPUIS REBRICKABLE -->
+                    <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-3 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <label class="text-[11px] font-bold uppercase text-amber-950 flex items-center gap-1.5">
+                                <i data-lucide="calendar-range" class="w-3.5 h-3.5 text-amber-700"></i>
+                                Dates exactes Rebrickable (copier-coller intelligent)
+                            </label>
+                            <a id="rb-dates-helper-link" href="https://rebrickable.com" target="_blank" rel="noopener" class="text-[11px] font-semibold text-lego-blue hover:underline">Voir sur Rebrickable ↗</a>
+                        </div>
+                        <input type="text" id="rb-released-paste" oninput="parseRebrickableDateRange(this.value)" placeholder="Colle ici ex: (Sept. 9, 2025 to July 31, 2027)" class="w-full px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div>
+                                <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Date de sortie</label>
+                                <input type="text" id="set-release-date" placeholder="ex: 9 sept. 2025" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Date de retrait prévue</label>
+                                <input type="text" id="set-retire-date" placeholder="ex: 31 juil. 2027" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            </div>
                         </div>
                     </div>
 
@@ -399,19 +510,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Prix estimé (€)</label>
-                            <input type="number" id="set-price" step="0.01" min="0" placeholder="ex: 59.99" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                        </div>
-                    </div>
-
-                    <!-- DATES DE SORTIE ET DE RETRAIT -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Date de sortie (auto)</label>
-                            <input type="text" id="set-release-date" placeholder="ex: Août 2025 ou 2027" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Date de retrait prévue</label>
-                            <input type="text" id="set-retire-date" placeholder="ex: Déc. 2026 ou Retiré" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                            <input type="number" id="set-price" step="0.01" min="0" placeholder="ex: 299.99" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
                         </div>
                     </div>
 
@@ -484,6 +583,116 @@
                         </button>
                         <button type="submit" class="px-5 py-2 bg-lego-red hover:bg-lego-redHover text-white font-semibold rounded-xl text-sm shadow-sm transition">
                             Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1B. MODALE AJOUT / ÉDITION D'UN MOC -->
+    <div id="moc-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden my-auto">
+            <div class="bg-purple-700 text-white px-6 py-4 flex items-center justify-between">
+                <h2 id="moc-modal-title" class="font-display text-xl font-bold flex items-center gap-2">
+                    <i data-lucide="puzzle" class="w-5 h-5"></i>
+                    <span>Ajouter un MOC Rebrickable</span>
+                </h2>
+                <button onclick="closeModal('moc-modal')" class="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+                <!-- RECHERCHE / IMPORT MOC REBRICKABLE -->
+                <div class="bg-purple-50 border border-purple-200 rounded-xl p-3.5 space-y-2">
+                    <label class="block text-xs font-bold uppercase text-purple-900 flex items-center justify-between">
+                        <span>Importer depuis Rebrickable (N° MOC ou URL)</span>
+                        <span id="moc-rb-status" class="text-[11px] font-normal text-purple-700">ex: MOC-123456</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="moc-rb-input" onkeydown="if(event.key==='Enter'){event.preventDefault(); fetchMocFromRebrickable();}" placeholder="Ex: MOC-148520 ou https://rebrickable.com/mocs/MOC-148520/..." class="flex-1 px-3 py-2 bg-white border border-purple-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                        <button type="button" onclick="fetchMocFromRebrickable()" class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl text-xs sm:text-sm transition shrink-0">
+                            Charger MOC
+                        </button>
+                    </div>
+                </div>
+
+                <form id="moc-form" onsubmit="saveMoc(event)" class="space-y-4">
+                    <input type="hidden" id="moc-id">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">N° MOC *</label>
+                            <input type="text" id="moc-number" required placeholder="ex: MOC-148520" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nom du MOC *</label>
+                            <input type="text" id="moc-name" required placeholder="ex: Modular Arkham Asylum Expansion" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Créateur / Designer</label>
+                            <input type="text" id="moc-designer" placeholder="ex: BrickArtisan" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nombre de pièces</label>
+                            <input type="number" id="moc-parts" min="0" placeholder="ex: 2450" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Prix notice (€)</label>
+                            <input type="number" id="moc-instructions-price" step="0.01" min="0" placeholder="ex: 15.00" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- LISTE DES SETS QUI COMPOSENT LE MOC -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold uppercase text-slate-700 flex items-center gap-1.5">
+                                <i data-lucide="boxes" class="w-4 h-4 text-purple-600"></i>
+                                Sets LEGO qui composent ce MOC
+                            </label>
+                            <button type="button" onclick="addMocRequiredSetRow()" class="text-xs font-semibold bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Ajouter un set
+                            </button>
+                        </div>
+
+                        <!-- Ajout rapide depuis la wishlist existante -->
+                        <div class="flex gap-2">
+                            <select id="moc-wishlist-picker" class="flex-1 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                                <option value="">-- Choisir un set déjà dans ma wishlist --</option>
+                            </select>
+                            <button type="button" onclick="addSelectedWishlistSetToMoc()" class="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-900 font-semibold rounded-lg text-xs shrink-0 transition">
+                                Ajouter
+                            </button>
+                        </div>
+
+                        <div id="moc-required-sets-container" class="space-y-2"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">URL Rebrickable du MOC</label>
+                        <input type="url" id="moc-url" placeholder="https://rebrickable.com/mocs/MOC-..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">URL de l'image du MOC</label>
+                        <input type="url" id="moc-image" placeholder="Rempli automatiquement ou URL manuelle" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Notes / Pièces supplémentaires requises</label>
+                        <textarea id="moc-note" rows="2" placeholder="ex: Nécessite 2x 76300 + quelques pièces BrickLink..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none"></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+                        <button type="button" onclick="closeModal('moc-modal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition">
+                            Annuler
+                        </button>
+                        <button type="submit" class="px-5 py-2 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl text-sm shadow-sm transition">
+                            Enregistrer le MOC
                         </button>
                     </div>
                 </form>
@@ -572,7 +781,7 @@
         </div>
     </div>
 
-    <!-- 4. MODALE COMPARATEUR RAPIDE (AVEC LEBONCOIN, VINTED & DEALABS) -->
+    <!-- 4. MODALE COMPARATEUR RAPIDE (AVEC DEALABS, LEBONCOIN & VINTED) -->
     <div id="comparator-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden my-auto">
             <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
@@ -588,11 +797,11 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">N° de set</label>
-                        <input type="text" id="quick-comp-number" placeholder="ex: 76341" oninput="updateQuickCompModalLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                        <input type="text" id="quick-comp-number" placeholder="ex: 76300" oninput="updateQuickCompModalLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-lego-blue focus:outline-none">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nom du set (pour slug Brickmitri)</label>
-                        <input type="text" id="quick-comp-name" placeholder="ex: Groot en tenue de Ravageur" oninput="updateQuickCompModalLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                        <input type="text" id="quick-comp-name" placeholder="ex: Arkham Asylum" oninput="updateQuickCompModalLinks()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-lego-blue focus:outline-none">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 gap-2.5 pt-1">
@@ -666,10 +875,10 @@
             </div>
             <div class="p-6 space-y-4 text-sm">
                 <p class="text-slate-600 text-xs">
-                    Votre liste est synchronisée en ligne avec la famille. Vous pouvez aussi télécharger ou importer un fichier JSON.
+                    Votre liste (sets + MOCs) est synchronisée en ligne avec la famille. Vous pouvez aussi télécharger ou importer un fichier JSON.
                 </p>
                 <button onclick="exportJSON()" class="w-full py-2.5 px-4 bg-lego-blue hover:bg-lego-blueHover text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition">
-                    <i data-lucide="download" class="w-4 h-4"></i> Télécharger ma liste (.json)
+                    <i data-lucide="download" class="w-4 h-4"></i> Télécharger ma liste complète (.json)
                 </button>
                 <div class="pt-3 border-t border-slate-200">
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-2">Importer un fichier (.json)</label>
@@ -715,10 +924,12 @@
         let cloudReady = false;
         let rbThemesCache = null;
         let numberLookupTimer = null;
+        let activePage = 'sets'; // 'sets' | 'mocs'
 
         let appState = {
             title: 'Ma Wishlist LEGO',
             sets: [],
+            mocs: [],
             isDemo: false
         };
 
@@ -729,16 +940,16 @@
         const DEFAULT_DEMO_SETS = [
             {
                 id: 'demo-1',
-                number: '76341',
-                name: 'Groot en tenue de Ravageur',
-                theme: 'Marvel',
-                price: 60,
-                releaseDate: '2025',
-                retireDate: '',
-                priority: 'medium',
+                number: '76300',
+                name: 'Arkham Asylum',
+                theme: 'Batman',
+                price: 299.99,
+                releaseDate: '9 sept. 2025',
+                retireDate: '31 juil. 2027',
+                priority: 'high',
                 occasion: 'Les deux',
-                image: 'https://www.lego.com/cdn/cs/set/assets/bltfdc3dfd99aac9d44/76341_Prod.png?width=1400',
-                note: 'Trouvable à 35€',
+                image: 'https://cdn.rebrickable.com/media/sets/76300-1.jpg',
+                note: 'Dates Rebrickable : 9 sept. 2025 au 31 juil. 2027',
                 customLinks: [],
                 isBundle: false,
                 bundleItems: [],
@@ -747,8 +958,135 @@
         ];
 
         // =========================================================================
+        // NAVIGATION ENTRE LES ONGLETS (WISHLIST SETS vs PAGE MOCs)
+        // =========================================================================
+        function switchPage(page) {
+            activePage = page;
+            const pageSets = document.getElementById('page-sets');
+            const pageMocs = document.getElementById('page-mocs');
+            const statsSets = document.getElementById('stats-sets-bar');
+            const statsMocs = document.getElementById('stats-mocs-bar');
+            const tabSetsBtn = document.getElementById('tab-sets-btn');
+            const tabMocsBtn = document.getElementById('tab-mocs-btn');
+            const addSetBtn = document.getElementById('add-set-btn');
+            const addMocBtn = document.getElementById('add-moc-btn');
+
+            if (page === 'sets') {
+                pageSets.classList.remove('hidden');
+                pageMocs.classList.add('hidden');
+                statsSets.classList.remove('hidden');
+                statsSets.classList.add('grid');
+                statsMocs.classList.add('hidden');
+                statsMocs.classList.remove('grid');
+
+                tabSetsBtn.className = 'px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition bg-slate-900 text-white shadow-sm';
+                tabMocsBtn.className = 'px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition bg-white/80 hover:bg-white text-slate-800';
+
+                if (currentMode === 'edit') {
+                    addSetBtn.classList.remove('hidden');
+                    addMocBtn.classList.add('hidden');
+                }
+                renderSets();
+            } else {
+                pageSets.classList.add('hidden');
+                pageMocs.classList.remove('hidden');
+                statsSets.classList.add('hidden');
+                statsSets.classList.remove('grid');
+                statsMocs.classList.remove('hidden');
+                statsMocs.classList.add('grid');
+
+                tabMocsBtn.className = 'px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition bg-purple-800 text-white shadow-sm';
+                tabSetsBtn.className = 'px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition bg-white/80 hover:bg-white text-slate-800';
+
+                if (currentMode === 'edit') {
+                    addSetBtn.classList.add('hidden');
+                    addMocBtn.classList.remove('hidden');
+                }
+                renderMocs();
+            }
+            lucide.createIcons();
+        }
+
+        // =========================================================================
+        // PARSEUR INTELLIGENT DES DATES REBRICKABLE "(Sept. 9, 2025 to July 31, 2027)"
+        // =========================================================================
+        const EN_MONTHS_TO_FR = {
+            'jan': 'janv.', 'january': 'janv.',
+            'feb': 'févr.', 'february': 'févr.',
+            'mar': 'mars', 'march': 'mars',
+            'apr': 'avr.', 'april': 'avr.',
+            'may': 'mai',
+            'jun': 'juin', 'june': 'juin',
+            'jul': 'juil.', 'july': 'juil.',
+            'aug': 'août', 'august': 'août',
+            'sep': 'sept.', 'sept': 'sept.', 'september': 'sept.',
+            'oct': 'oct.', 'october': 'oct.',
+            'nov': 'nov.', 'november': 'nov.',
+            'dec': 'déc.', 'december': 'déc.'
+        };
+
+        function formatEnglishDateToFrench(rawDateStr) {
+            const cleaned = rawDateStr.replace(/[()]/g, '').trim();
+            // Format "Sept. 9, 2025" ou "July 31, 2027"
+            const match = cleaned.match(/^([A-Za-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})$/);
+            if (match) {
+                const mKey = match[1].toLowerCase();
+                const day = match[2];
+                const year = match[3];
+                const frMonth = EN_MONTHS_TO_FR[mKey] || match[1];
+                return `${day} ${frMonth} ${year}`;
+            }
+            return cleaned;
+        }
+
+        function parseRebrickableDateRange(text) {
+            if (!text) return;
+            // Ex: "(Sept. 9, 2025 to July 31, 2027)" ou "Sept. 9, 2025 to July 31, 2027"
+            const rangeMatch = text.match(/([A-Za-z]+\.?\s+\d{1,2},?\s+\d{4})\s*(?:to|-|–|au)\s*([A-Za-z]+\.?\s+\d{1,2},?\s+\d{4})/i);
+            if (rangeMatch) {
+                const frStart = formatEnglishDateToFrench(rangeMatch[1]);
+                const frEnd = formatEnglishDateToFrench(rangeMatch[2]);
+                document.getElementById('set-release-date').value = frStart;
+                document.getElementById('set-retire-date').value = frEnd;
+                showToast(`Dates extraites : sortie ${frStart} / retrait ${frEnd}`, 'success');
+                return;
+            }
+            // Sinon si une seule date
+            const singleMatch = text.match(/([A-Za-z]+\.?\s+\d{1,2},?\s+\d{4})/);
+            if (singleMatch) {
+                const frSingle = formatEnglishDateToFrench(singleMatch[1]);
+                document.getElementById('set-release-date').value = frSingle;
+                showToast(`Date de sortie extraite : ${frSingle}`, 'success');
+            }
+        }
+
+        // =========================================================================
         // DÉTECTION "PAS ENCORE SORTI"
         // =========================================================================
+        const FR_MONTH_INDEX = {
+            'janv': 0, 'jan': 0, 'févr': 1, 'fev': 1, 'mars': 2, 'mar': 2,
+            'avr': 3, 'mai': 4, 'juin': 5, 'juil': 6, 'août': 7, 'aout': 7,
+            'sept': 8, 'sep': 8, 'oct': 9, 'nov': 10, 'déc': 11, 'dec': 11
+        };
+
+        function parseFrenchOrIsoDate(str) {
+            const s = String(str || '').trim().toLowerCase();
+            if (!s) return null;
+            if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+                const d = new Date(s);
+                return isNaN(d.getTime()) ? null : d;
+            }
+            const frMatch = s.match(/^(\d{1,2})\s+([a-zéû]+)\.?\s+(20\d{2})$/);
+            if (frMatch) {
+                const day = parseInt(frMatch[1], 10);
+                const mKey = frMatch[2].slice(0, 4);
+                const month = FR_MONTH_INDEX[mKey] ?? FR_MONTH_INDEX[frMatch[2].slice(0, 3)];
+                const year = parseInt(frMatch[3], 10);
+                if (month !== undefined) return new Date(year, month, day);
+            }
+            return null;
+        }
+
         function isSetUnreleased(set) {
             const now = new Date();
             const currentYear = now.getFullYear();
@@ -758,21 +1096,20 @@
             if (note.includes('sort le')) return true;
 
             if (rel) {
+                const parsedFullDate = parseFrenchOrIsoDate(rel);
+                if (parsedFullDate && parsedFullDate > now) return true;
+
                 const yearMatch = rel.match(/\b(20\d{2})\b/);
                 if (yearMatch) {
                     const y = parseInt(yearMatch[1], 10);
                     if (y > currentYear) return true;
-                }
-                if (/^\d{4}-\d{2}-\d{2}$/.test(rel)) {
-                    const d = new Date(rel);
-                    if (!isNaN(d.getTime()) && d > now) return true;
                 }
             }
             return false;
         }
 
         // =========================================================================
-        // REBRICKABLE API (AUTO-COMPLÉTION AU NUMÉRO & RECHERCHE)
+        // REBRICKABLE API (AUTO-COMPLÉTION AU NUMÉRO, RECHERCHE & MOCs)
         // =========================================================================
         async function loadRebrickableThemes() {
             if (rbThemesCache) return rbThemesCache;
@@ -796,7 +1133,7 @@
             if (combined.includes('simpson')) return 'Simpsons';
             if (combined.includes('scooby')) return 'Scooby-Doo';
             if (combined.includes('one piece')) return 'One Piece';
-            if (combined.includes('batman')) return 'Batman';
+            if (combined.includes('batman') || combined.includes('arkham')) return 'Batman';
             if (combined.includes('dc') || combined.includes('superman') || combined.includes('justice league')) return 'DC';
             if (combined.includes('marvel') || combined.includes('avengers') || combined.includes('spider-man') || combined.includes('groot')) return 'Marvel';
             if (combined.includes('star wars')) return 'Star Wars';
@@ -848,6 +1185,11 @@
 
                 document.getElementById('set-theme').value = mapRebrickableTheme(rbTheme, data.name);
 
+                if (data.set_url) {
+                    document.getElementById('rb-dates-helper-link').href = data.set_url;
+                    document.getElementById('live-link-rb').href = data.set_url;
+                }
+
                 const currentYear = new Date().getFullYear();
                 if (data.year && Number(data.year) <= currentYear - 3) {
                     document.getElementById('set-retired').checked = true;
@@ -855,7 +1197,7 @@
 
                 updateLiveComparatorLinks();
                 statusEl.textContent = `✓ Infos #${cleanNum} chargées (${data.year})`;
-                showToast(`Infos et date de sortie (${data.year}) trouvées pour #${cleanNum} !`, 'success');
+                showToast(`Infos #${cleanNum} chargées ! Clique sur "Voir sur Rebrickable" pour copier les dates exactes si besoin.`, 'success');
             } catch (err) {
                 statusEl.textContent = 'Erreur Rebrickable';
             }
@@ -903,6 +1245,7 @@
                             name: s.name,
                             year: s.year,
                             image: img,
+                            setUrl: s.set_url || '',
                             rbTheme: themeName,
                             parts: s.num_parts
                         }).replace(/'/g, "&#39;")})' class="w-full text-left p-2.5 hover:bg-blue-50 transition flex items-center gap-3">
@@ -932,6 +1275,10 @@
             document.getElementById('set-name').value = item.name;
             if (item.image) document.getElementById('set-image').value = item.image;
             if (item.year) document.getElementById('set-release-date').value = String(item.year);
+            if (item.setUrl) {
+                document.getElementById('rb-dates-helper-link').href = item.setUrl;
+                document.getElementById('live-link-rb').href = item.setUrl;
+            }
 
             const mappedTheme = mapRebrickableTheme(item.rbTheme, item.name);
             document.getElementById('set-theme').value = mappedTheme;
@@ -1047,6 +1394,9 @@
             const vintedUrl = cleanNum
                 ? `https://www.vinted.fr/catalog?search_text=${encodeURIComponent('lego ' + cleanNum)}`
                 : `https://www.vinted.fr/catalog?search_text=lego`;
+            const rebrickableUrl = /^\d+$/.test(cleanNum)
+                ? `https://rebrickable.com/sets/${cleanNum}-1/`
+                : `https://rebrickable.com/search/?q=${encodedNum}`;
 
             return {
                 avenue: avenueUrl,
@@ -1054,7 +1404,8 @@
                 planet: planetUrl,
                 dealabs: dealabsUrl,
                 leboncoin: leboncoinUrl,
-                vinted: vintedUrl
+                vinted: vintedUrl,
+                rebrickable: rebrickableUrl
             };
         }
 
@@ -1073,6 +1424,8 @@
             const bar = document.getElementById('live-comparator-bar');
             if (num.length >= 3) {
                 const urls = getComparatorUrls(num, name);
+                document.getElementById('live-link-rb').href = urls.rebrickable;
+                document.getElementById('rb-dates-helper-link').href = urls.rebrickable;
                 document.getElementById('live-link-adlb').href = urls.avenue;
                 document.getElementById('live-link-bm').href = urls.brickmitri;
                 document.getElementById('live-link-pb').href = urls.planet;
@@ -1144,6 +1497,384 @@
         }
 
         // =========================================================================
+        // GESTION DE LA PAGE MOCs (CRUD, REBRICKABLE & LISTE DES SETS REQUIS)
+        // =========================================================================
+        async function fetchMocFromRebrickable() {
+            const raw = document.getElementById('moc-rb-input').value.trim();
+            const statusEl = document.getElementById('moc-rb-status');
+            if (!raw) {
+                showToast('Entre un numéro MOC-xxxxx ou une URL Rebrickable.', 'info');
+                return;
+            }
+            const mocMatch = raw.match(/(MOC-\d+)/i) || raw.match(/^(\d+)$/);
+            if (!mocMatch) {
+                showToast('Format MOC invalide (ex: MOC-148520).', 'error');
+                return;
+            }
+            const mocNum = mocMatch[1].toUpperCase().startsWith('MOC-')
+                ? mocMatch[1].toUpperCase()
+                : `MOC-${mocMatch[1]}`;
+
+            statusEl.textContent = `Chargement ${mocNum}...`;
+            try {
+                const res = await fetch(`https://rebrickable.com/api/v3/lego/mocs/${encodeURIComponent(mocNum)}/`, {
+                    headers: { 'Authorization': `key ${REBRICKABLE_API_KEY}` }
+                });
+                if (!res.ok) {
+                    statusEl.textContent = 'MOC introuvable via API';
+                    document.getElementById('moc-number').value = mocNum;
+                    document.getElementById('moc-url').value = `https://rebrickable.com/mocs/${mocNum}/`;
+                    showToast(`${mocNum} pré-rempli (complète le nom manuellement).`, 'info');
+                    return;
+                }
+                const data = await res.json();
+                document.getElementById('moc-number').value = data.set_num || mocNum;
+                document.getElementById('moc-name').value = data.name || '';
+                document.getElementById('moc-designer').value = data.designer_name || '';
+                document.getElementById('moc-parts').value = data.num_parts || '';
+                document.getElementById('moc-url').value = data.moc_url || `https://rebrickable.com/mocs/${mocNum}/`;
+                if (data.moc_img_url) document.getElementById('moc-image').value = data.moc_img_url;
+
+                statusEl.textContent = `✓ ${mocNum} importé`;
+                showToast(`MOC ${mocNum} importé depuis Rebrickable !`, 'success');
+            } catch (err) {
+                statusEl.textContent = 'Erreur Rebrickable';
+                showToast('Impossible de contacter Rebrickable pour ce MOC.', 'error');
+            }
+        }
+
+        function addMocRequiredSetRow(setNum = '', setName = '', qty = 1, price = '') {
+            const container = document.getElementById('moc-required-sets-container');
+            const row = document.createElement('div');
+            row.className = 'moc-req-row grid grid-cols-12 gap-1.5 items-center';
+            row.innerHTML = `
+                <input type="number" min="1" value="${qty || 1}" title="Quantité" class="moc-req-qty col-span-2 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center">
+                <input type="text" placeholder="N° set" value="${escapeHTML(setNum)}" class="moc-req-num col-span-3 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold">
+                <input type="text" placeholder="Nom du set" value="${escapeHTML(setName)}" class="moc-req-name col-span-4 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs">
+                <input type="number" step="0.01" min="0" placeholder="Prix €" value="${price !== '' && price != null ? price : ''}" class="moc-req-price col-span-2 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs">
+                <button type="button" onclick="this.parentElement.remove()" class="col-span-1 p-1.5 text-slate-400 hover:text-lego-red rounded-lg flex justify-center">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            `;
+            container.appendChild(row);
+            lucide.createIcons();
+        }
+
+        function addSelectedWishlistSetToMoc() {
+            const picker = document.getElementById('moc-wishlist-picker');
+            const selectedId = picker.value;
+            if (!selectedId) return;
+            const s = appState.sets.find(item => item.id === selectedId);
+            if (!s) return;
+            addMocRequiredSetRow(s.number, s.name, 1, s.price || '');
+            picker.value = '';
+        }
+
+        function collectMocRequiredSets() {
+            const rows = document.querySelectorAll('#moc-required-sets-container .moc-req-row');
+            const items = [];
+            rows.forEach(row => {
+                const qty = Math.max(1, parseInt(row.querySelector('.moc-req-qty').value, 10) || 1);
+                const number = row.querySelector('.moc-req-num').value.trim();
+                const name = row.querySelector('.moc-req-name').value.trim();
+                const priceVal = parseFloat(row.querySelector('.moc-req-price').value);
+                const price = isNaN(priceVal) ? null : priceVal;
+                if (number) {
+                    items.push({ qty, number, name: name || `Set #${number}`, price });
+                }
+            });
+            return items;
+        }
+
+        function openMocModal(mocId = null) {
+            const form = document.getElementById('moc-form');
+            form.reset();
+            document.getElementById('moc-id').value = '';
+            document.getElementById('moc-rb-input').value = '';
+            document.getElementById('moc-rb-status').textContent = 'ex: MOC-123456';
+            document.getElementById('moc-required-sets-container').innerHTML = '';
+
+            // Peupler le sélecteur des sets de la wishlist
+            const picker = document.getElementById('moc-wishlist-picker');
+            picker.innerHTML = `<option value="">-- Choisir un set déjà dans ma wishlist --</option>` +
+                appState.sets.filter(s => !s.isBundle).map(s =>
+                    `<option value="${escapeHTML(s.id)}">#${escapeHTML(s.number)} - ${escapeHTML(s.name)} ${s.price ? '(' + s.price + ' €)' : ''}</option>`
+                ).join('');
+
+            if (mocId) {
+                const moc = appState.mocs.find(m => m.id === mocId);
+                if (!moc) return;
+                document.getElementById('moc-modal-title').innerHTML = `<i data-lucide="pencil" class="w-5 h-5"></i><span>Modifier ${escapeHTML(moc.number)}</span>`;
+                document.getElementById('moc-id').value = moc.id;
+                document.getElementById('moc-number').value = moc.number;
+                document.getElementById('moc-name').value = moc.name;
+                document.getElementById('moc-designer').value = moc.designer || '';
+                document.getElementById('moc-parts').value = moc.parts || '';
+                document.getElementById('moc-instructions-price').value = moc.instructionsPrice || '';
+                document.getElementById('moc-url').value = moc.url || '';
+                document.getElementById('moc-image').value = moc.image || '';
+                document.getElementById('moc-note').value = moc.note || '';
+
+                if (Array.isArray(moc.requiredSets) && moc.requiredSets.length > 0) {
+                    moc.requiredSets.forEach(rs => addMocRequiredSetRow(rs.number, rs.name, rs.qty, rs.price));
+                } else {
+                    addMocRequiredSetRow();
+                }
+            } else {
+                document.getElementById('moc-modal-title').innerHTML = `<i data-lucide="puzzle" class="w-5 h-5"></i><span>Ajouter un MOC Rebrickable</span>`;
+                addMocRequiredSetRow();
+            }
+
+            openModal('moc-modal');
+            lucide.createIcons();
+        }
+
+        async function saveMoc(event) {
+            event.preventDefault();
+            const id = document.getElementById('moc-id').value;
+            const number = document.getElementById('moc-number').value.trim();
+            const name = document.getElementById('moc-name').value.trim();
+            const designer = document.getElementById('moc-designer').value.trim();
+            const partsVal = parseInt(document.getElementById('moc-parts').value, 10);
+            const parts = isNaN(partsVal) ? null : partsVal;
+            const instrVal = parseFloat(document.getElementById('moc-instructions-price').value);
+            const instructionsPrice = isNaN(instrVal) ? null : instrVal;
+            const url = document.getElementById('moc-url').value.trim() || `https://rebrickable.com/mocs/${encodeURIComponent(number)}/`;
+            const image = document.getElementById('moc-image').value.trim();
+            const note = document.getElementById('moc-note').value.trim();
+            const requiredSets = collectMocRequiredSets();
+
+            if (!number || !name) return;
+
+            let savedMoc = null;
+            if (id) {
+                const idx = appState.mocs.findIndex(m => m.id === id);
+                if (idx !== -1) {
+                    appState.mocs[idx] = {
+                        ...appState.mocs[idx],
+                        number, name, designer, parts, instructionsPrice, url, image, note, requiredSets
+                    };
+                    savedMoc = appState.mocs[idx];
+                    showToast(`MOC ${number} mis à jour !`, 'success');
+                }
+            } else {
+                savedMoc = {
+                    id: 'moc-' + Date.now(),
+                    itemType: 'moc',
+                    number, name, designer, parts, instructionsPrice, url, image, note, requiredSets
+                };
+                appState.mocs.unshift(savedMoc);
+                showToast(`MOC ${number} ajouté !`, 'success');
+            }
+
+            saveToLocalStorage();
+            try {
+                if (savedMoc && cloudReady) {
+                    await syncSetToCloud({ ...savedMoc, itemType: 'moc' });
+                }
+                closeModal('moc-modal');
+                renderMocs();
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur de sauvegarde cloud du MOC : ' + (err.message || err), 'error');
+            }
+        }
+
+        async function deleteMoc(mocId) {
+            const moc = appState.mocs.find(m => m.id === mocId);
+            if (!moc) return;
+            appState.mocs = appState.mocs.filter(m => m.id !== mocId);
+            saveToLocalStorage();
+            try {
+                if (cloudReady) {
+                    const { error } = await supabaseClient.from('lego_sets').delete().eq('id', String(mocId));
+                    if (error) throw error;
+                }
+                renderMocs();
+                showToast(`MOC ${moc.number} supprimé.`, 'info');
+            } catch (err) {
+                showToast('Erreur de suppression : ' + (err.message || err), 'error');
+            }
+        }
+
+        async function quickAddMissingSetToWishlist(setNumber, setName, setPrice) {
+            const exists = appState.sets.some(s => String(s.number) === String(setNumber));
+            if (exists) {
+                showToast(`Le set #${setNumber} est déjà dans ta wishlist !`, 'info');
+                return;
+            }
+            const newSet = {
+                id: 'set-' + Date.now(),
+                number: String(setNumber),
+                name: setName || `Set #${setNumber}`,
+                theme: 'Autre',
+                price: setPrice != null && setPrice !== '' ? Number(setPrice) : null,
+                releaseDate: '',
+                retireDate: '',
+                priority: 'high',
+                occasion: 'Les deux',
+                image: `https://cdn.rebrickable.com/media/sets/${encodeURIComponent(setNumber)}-1.jpg`,
+                note: 'Ajouté depuis la page MOCs',
+                customLinks: [],
+                isBundle: false,
+                bundleItems: [],
+                reservedBy: ''
+            };
+            appState.sets.unshift(newSet);
+            saveToLocalStorage();
+            try {
+                if (cloudReady) await syncSetToCloud(newSet);
+                updateNavCounts();
+                renderMocs();
+                showToast(`Set #${setNumber} ajouté à ta wishlist !`, 'success');
+            } catch (err) {
+                showToast('Erreur ajout wishlist : ' + (err.message || err), 'error');
+            }
+        }
+
+        function renderMocs() {
+            const grid = document.getElementById('mocs-grid');
+            const emptyState = document.getElementById('mocs-empty-state');
+            updateNavCounts();
+
+            // Statistiques MOCs
+            const totalMocs = appState.mocs.length;
+            let totalReqSets = 0;
+            let totalMocsBudget = 0;
+
+            appState.mocs.forEach(m => {
+                const reqs = Array.isArray(m.requiredSets) ? m.requiredSets : [];
+                reqs.forEach(r => {
+                    const q = r.qty || 1;
+                    totalReqSets += q;
+                    const wishlistMatch = appState.sets.find(s => String(s.number) === String(r.number));
+                    const unitPrice = r.price != null ? Number(r.price) : (wishlistMatch?.price ? Number(wishlistMatch.price) : 0);
+                    totalMocsBudget += unitPrice * q;
+                });
+                if (m.instructionsPrice) totalMocsBudget += Number(m.instructionsPrice);
+            });
+
+            document.getElementById('stat-total-mocs').textContent = totalMocs;
+            document.getElementById('stat-mocs-sets-count').textContent = totalReqSets;
+            document.getElementById('stat-mocs-total-price').textContent = totalMocsBudget.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €';
+
+            if (totalMocs === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = appState.mocs.map(moc => {
+                const reqs = Array.isArray(moc.requiredSets) ? moc.requiredSets : [];
+                let setsSubtotal = 0;
+                const reqListHTML = reqs.map(r => {
+                    const q = r.qty || 1;
+                    const inWishlist = appState.sets.find(s => String(s.number) === String(r.number));
+                    const unitPrice = r.price != null ? Number(r.price) : (inWishlist?.price ? Number(inWishlist.price) : null);
+                    if (unitPrice != null) setsSubtotal += unitPrice * q;
+
+                    const statusBadge = inWishlist
+                        ? (inWishlist.reservedBy
+                            ? `<span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">✓ Réservé (${escapeHTML(inWishlist.reservedBy)})</span>`
+                            : `<span class="text-[10px] font-bold bg-blue-100 text-lego-blue px-1.5 py-0.5 rounded">Dans la wishlist</span>`)
+                        : (currentMode === 'edit'
+                            ? `<button type="button" onclick="quickAddMissingSetToWishlist('${escapeHTML(r.number)}', '${escapeHTML(r.name).replace(/'/g, "\\'")}', '${unitPrice ?? ''}')" class="text-[10px] font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded transition">+ Ajouter wishlist</button>`
+                            : `<span class="text-[10px] font-medium bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">Manquant</span>`);
+
+                    return `
+                        <li class="flex items-center justify-between gap-2 py-1.5 border-b border-purple-100 last:border-0 text-xs">
+                            <div class="min-w-0">
+                                <span class="font-bold text-purple-900">${q}×</span>
+                                <span class="font-mono font-bold text-slate-800">#${escapeHTML(r.number)}</span>
+                                <span class="text-slate-600 truncate">${escapeHTML(r.name)}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                ${unitPrice != null ? `<span class="text-[11px] font-semibold text-slate-500">${(unitPrice * q).toFixed(0)} €</span>` : ''}
+                                ${statusBadge}
+                            </div>
+                        </li>
+                    `;
+                }).join('');
+
+                const totalMocCost = setsSubtotal + (moc.instructionsPrice ? Number(moc.instructionsPrice) : 0);
+                const visualHeader = moc.image
+                    ? `<img src="${escapeHTML(moc.image)}" alt="${escapeHTML(moc.name)}" onerror="this.onerror=null;this.parentElement.innerHTML=generateLegoPlaceholderSVG('${escapeHTML(moc.number)}', 'MOC')" class="w-full h-44 object-contain bg-white p-3">`
+                    : generateLegoPlaceholderSVG(moc.number, 'MOC');
+
+                const editFooter = currentMode === 'edit'
+                    ? `
+                        <div class="flex items-center justify-end gap-1 pt-2 border-t border-slate-100">
+                            <button onclick="openMocModal('${moc.id}')" title="Modifier" class="p-2 text-slate-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteMoc('${moc.id}')" title="Supprimer" class="p-2 text-slate-500 hover:text-lego-red hover:bg-red-50 rounded-lg transition">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    `
+                    : '';
+
+                return `
+                    <article class="bg-white rounded-2xl shadow-sm border border-purple-200 overflow-hidden flex flex-col card-hover relative">
+                        <div class="relative border-b border-slate-100 bg-slate-50/70">
+                            ${visualHeader}
+                            <span class="absolute top-3 left-3 bg-purple-800 text-white font-mono text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm">
+                                ${escapeHTML(moc.number)}
+                            </span>
+                            ${moc.parts ? `<span class="absolute top-3 right-3 bg-slate-900/85 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">${moc.parts} pièces</span>` : ''}
+                        </div>
+
+                        <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                            <div>
+                                ${moc.designer ? `<p class="text-[11px] font-semibold text-purple-700 mb-1">Par ${escapeHTML(moc.designer)}</p>` : ''}
+                                <h3 class="font-display text-lg font-bold text-slate-900 leading-snug">${escapeHTML(moc.name)}</h3>
+
+                                <div class="flex flex-wrap items-center gap-3 mt-1.5">
+                                    <p class="text-lg font-bold text-purple-800">
+                                        Total estimé : ${totalMocCost > 0 ? totalMocCost.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €' : 'Non défini'}
+                                    </p>
+                                    ${moc.instructionsPrice ? `<span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full font-medium">Notice : ${moc.instructionsPrice} €</span>` : ''}
+                                </div>
+
+                                <div class="mt-3 bg-purple-50/60 border border-purple-200/80 rounded-xl p-3">
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-purple-900 mb-1">
+                                        Sets nécessaires (${reqs.length}) :
+                                    </p>
+                                    ${reqs.length > 0
+                                        ? `<ul class="divide-y divide-purple-100">${reqListHTML}</ul>`
+                                        : `<p class="text-xs text-slate-400 italic">Aucun set associé pour le moment.</p>`
+                                    }
+                                </div>
+
+                                ${moc.note ? `
+                                    <p class="mt-2.5 text-xs text-slate-600 bg-slate-50 border border-slate-200/70 rounded-xl p-2.5 italic whitespace-pre-line">
+                                        "${escapeHTML(moc.note)}"
+                                    </p>
+                                ` : ''}
+                            </div>
+
+                            <div class="space-y-2">
+                                <a href="${escapeHTML(moc.url || 'https://rebrickable.com')}" target="_blank" rel="noopener noreferrer" class="w-full py-2 px-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+                                    <span>Voir les instructions sur Rebrickable</span>
+                                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                                </a>
+                                ${editFooter}
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function updateNavCounts() {
+            document.getElementById('tab-sets-count').textContent = appState.sets.length;
+            document.getElementById('tab-mocs-count').textContent = appState.mocs.length;
+        }
+
+        // =========================================================================
         // INITIALISATION & SUPABASE
         // =========================================================================
         window.addEventListener('DOMContentLoaded', async () => {
@@ -1158,6 +1889,7 @@
                 loadLocalFallback();
             }
             renderSets();
+            renderMocs();
         });
 
         function loadLocalFallback() {
@@ -1167,17 +1899,21 @@
                     const parsed = JSON.parse(saved);
                     appState.title = parsed.title || 'Ma Wishlist LEGO';
                     appState.sets = Array.isArray(parsed.sets) ? parsed.sets : [];
+                    appState.mocs = Array.isArray(parsed.mocs) ? parsed.mocs : [];
                     appState.isDemo = Boolean(parsed.isDemo);
                 } catch (_) {
                     appState.sets = [...DEFAULT_DEMO_SETS];
+                    appState.mocs = [];
                     appState.isDemo = true;
                 }
             } else {
                 appState.sets = [...DEFAULT_DEMO_SETS];
+                appState.mocs = [];
                 appState.isDemo = true;
                 saveToLocalStorage();
             }
             document.getElementById('list-title-display').textContent = appState.title;
+            updateNavCounts();
             updateDemoBanner();
         }
 
@@ -1238,18 +1974,31 @@
             if (reservationsError) throw reservationsError;
             if (settingsError) throw settingsError;
             const reservationMap = new Map((reservations || []).map(r => [String(r.set_id), r]));
-            appState.sets = (rows || []).map(row => {
-                const set = { ...row.data, id: String(row.id) };
-                const reservation = reservationMap.get(String(row.id));
-                set.reservedBy = reservation?.reserved_by || '';
-                set.reservationOwnerId = reservation?.owner_id || null;
-                return set;
+
+            const loadedSets = [];
+            const loadedMocs = [];
+
+            (rows || []).forEach(row => {
+                const rawItem = { ...row.data, id: String(row.id) };
+                if (rawItem.itemType === 'moc' || String(row.id).startsWith('moc-')) {
+                    loadedMocs.push(rawItem);
+                } else {
+                    const reservation = reservationMap.get(String(row.id));
+                    rawItem.reservedBy = reservation?.reserved_by || '';
+                    rawItem.reservationOwnerId = reservation?.owner_id || null;
+                    loadedSets.push(rawItem);
+                }
             });
+
+            appState.sets = loadedSets;
+            appState.mocs = loadedMocs;
             appState.title = settings?.title || 'Ma Wishlist LEGO';
             appState.isDemo = false;
             saveToLocalStorage();
             document.getElementById('list-title-display').textContent = appState.title;
-            renderSets();
+            updateNavCounts();
+            if (activePage === 'sets') renderSets();
+            else renderMocs();
         }
 
         function subscribeToCloudChanges() {
@@ -1274,6 +2023,7 @@
             if (!isViewingSharedUrl) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
             }
+            updateNavCounts();
             updateDemoBanner();
         }
 
@@ -1313,13 +2063,16 @@
             if (isFamilyShareLink && mode === 'edit') return;
             currentMode = mode;
             updateModeUI();
-            renderSets();
+            if (activePage === 'sets') renderSets();
+            else renderMocs();
         }
 
         function updateModeUI() {
             const editBtn = document.getElementById('mode-edit-btn');
             const familyBtn = document.getElementById('mode-family-btn');
-            const addBtn = document.getElementById('add-set-btn');
+            const addSetBtn = document.getElementById('add-set-btn');
+            const addMocBtn = document.getElementById('add-moc-btn');
+            const addMocBannerBtn = document.getElementById('add-moc-banner-btn');
             const editTitleBtn = document.getElementById('edit-title-btn');
             const shareBtn = document.getElementById('share-btn');
             const backupBtn = document.getElementById('backup-btn');
@@ -1327,7 +2080,9 @@
             if (isFamilyShareLink) {
                 editBtn.classList.add('hidden');
                 shareBtn?.classList.add('hidden');
-                addBtn.classList.add('hidden');
+                addSetBtn.classList.add('hidden');
+                addMocBtn.classList.add('hidden');
+                addMocBannerBtn?.classList.add('hidden');
                 editTitleBtn.classList.add('hidden');
                 backupBtn?.classList.add('hidden');
             } else {
@@ -1339,18 +2094,27 @@
             if (currentMode === 'edit') {
                 editBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition bg-slate-900 text-white shadow-sm';
                 familyBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition text-slate-600 hover:text-slate-900';
-                addBtn.classList.remove('hidden');
+                if (activePage === 'sets') {
+                    addSetBtn.classList.remove('hidden');
+                    addMocBtn.classList.add('hidden');
+                } else {
+                    addSetBtn.classList.add('hidden');
+                    addMocBtn.classList.remove('hidden');
+                }
+                addMocBannerBtn?.classList.remove('hidden');
                 editTitleBtn.classList.remove('hidden');
             } else {
                 familyBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition bg-lego-green text-white shadow-sm';
                 editBtn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition text-slate-600 hover:text-slate-900';
-                addBtn.classList.add('hidden');
+                addSetBtn.classList.add('hidden');
+                addMocBtn.classList.add('hidden');
+                addMocBannerBtn?.classList.add('hidden');
                 editTitleBtn.classList.add('hidden');
             }
         }
 
         // =========================================================================
-        // RENDU DE LA GRILLE ET STATISTIQUES
+        // RENDU DE LA GRILLE DES SETS ET STATISTIQUES
         // =========================================================================
         function renderSets() {
             const grid = document.getElementById('sets-grid');
@@ -1424,6 +2188,7 @@
             });
 
             updateStats();
+            updateNavCounts();
 
             if (filtered.length === 0) {
                 grid.innerHTML = '';
@@ -1662,7 +2427,7 @@
                         <circle cx="24" cy="31" r="4" fill="#FEF08A"/>
                         <circle cx="56" cy="31" r="4" fill="#FEF08A"/>
                     </svg>
-                    <span class="font-mono font-bold text-lg text-slate-800 tracking-wider px-3 truncate max-w-full">SET ${escapeHTML(number)}</span>
+                    <span class="font-mono font-bold text-lg text-slate-800 tracking-wider px-3 truncate max-w-full">${escapeHTML(number)}</span>
                     <span class="text-[11px] font-medium text-slate-500 uppercase tracking-widest">${escapeHTML(theme || 'LEGO')}</span>
                 </div>
             `;
@@ -1676,6 +2441,7 @@
             form.reset();
             document.getElementById('set-id').value = '';
             document.getElementById('rb-search-input').value = '';
+            document.getElementById('rb-released-paste').value = '';
             document.getElementById('rb-results').classList.add('hidden');
             document.getElementById('rb-status').textContent = 'Auto-détection active';
             document.getElementById('live-comparator-bar').classList.add('hidden');
@@ -1913,20 +2679,26 @@
                     if (imported && Array.isArray(imported.sets)) {
                         appState.title = imported.title || 'Ma Wishlist LEGO';
                         appState.sets = imported.sets;
+                        appState.mocs = Array.isArray(imported.mocs) ? imported.mocs : [];
                         appState.isDemo = false;
                         isViewingSharedUrl = false;
                         saveToLocalStorage();
                         try {
                             const { error: clearError } = await supabaseClient.from('lego_sets').delete().neq('id', '__none__');
                             if (clearError) throw clearError;
-                            const rows = appState.sets.map(set => {
+                            const setRows = appState.sets.map(set => {
                                 const copy = { ...set };
                                 delete copy.reservedBy;
                                 delete copy.reservationOwnerId;
                                 return { id: String(set.id), data: copy };
                             });
-                            if (rows.length) {
-                                const { error } = await supabaseClient.from('lego_sets').upsert(rows);
+                            const mocRows = appState.mocs.map(moc => ({
+                                id: String(moc.id),
+                                data: { ...moc, itemType: 'moc' }
+                            }));
+                            const allRows = [...setRows, ...mocRows];
+                            if (allRows.length) {
+                                const { error } = await supabaseClient.from('lego_sets').upsert(allRows);
                                 if (error) throw error;
                             }
                             const { error: titleError } = await supabaseClient.from('list_settings').upsert({ id: 1, title: appState.title }, { onConflict: 'id' });
@@ -1937,8 +2709,9 @@
                         document.getElementById('list-title-display').textContent = appState.title;
                         await refreshCloudData();
                         renderSets();
+                        renderMocs();
                         closeModal('backup-modal');
-                        showToast('Liste importée avec succès !', 'success');
+                        showToast('Liste complète (sets + MOCs) importée !', 'success');
                     } else {
                         showToast('Format de fichier JSON invalide.', 'error');
                     }
