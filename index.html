@@ -142,7 +142,7 @@
                 </button>
             </div>
 
-            <!-- BARRE DE STATISTIQUES -->
+            <!-- BARRE DE STATISTIQUES SETS -->
             <div id="stats-sets-bar" class="grid grid-cols-3 gap-3 mt-4">
                 <div class="bg-white/95 backdrop-blur rounded-xl p-3 sm:px-4 shadow-sm border border-amber-200/80 flex items-center justify-between">
                     <div>
@@ -343,7 +343,7 @@
                 </div>
                 <div>
                     <h2 class="font-display text-lg font-bold text-purple-950">Mes MOCs & Constructions alternatives</h2>
-                    <p class="text-xs text-purple-800">Associe chaque MOC Rebrickable à la liste des boîtes LEGO nécessaires pour le construire, et ajoute les sets manquants à ta wishlist en un clic.</p>
+                    <p class="text-xs text-purple-800">Importe directement depuis Rebrickable : le titre, créateur, pièces, visuel et les sets requis (Alternate Builds) sont récupérés automatiquement.</p>
                 </div>
             </div>
             <button id="add-moc-banner-btn" onclick="openMocModal()" class="bg-purple-700 hover:bg-purple-800 text-white font-semibold px-4 py-2 rounded-xl text-xs sm:text-sm transition flex items-center gap-2 shrink-0 self-start sm:self-auto">
@@ -361,7 +361,7 @@
             </div>
             <h3 class="font-display text-xl font-bold text-slate-800 mb-1">Aucun MOC enregistré</h3>
             <p class="text-slate-500 text-sm max-w-md mx-auto mb-5">
-                Ajoute une création Rebrickable (ex: <span class="font-mono font-semibold">MOC-123456</span>) et liste les sets nécessaires pour la fabriquer.
+                Recherche un MOC Rebrickable par mot-clé ou numéro (ex: <span class="font-mono font-semibold">MOC-148520</span>) pour importer ses infos et sets requis.
             </p>
             <button onclick="openMocModal()" class="px-5 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl text-sm transition inline-flex items-center gap-2">
                 <i data-lucide="plus" class="w-4 h-4"></i> Ajouter mon premier MOC
@@ -372,8 +372,8 @@
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 py-5 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-            <p>Ma Wishlist LEGO & MOCs — Synchronisation Supabase & Recherche Rebrickable.</p>
-            <p>Comparateurs : Avenue de la Brique, Brickmitri.com, Planet-Brick, Dealabs, Leboncoin & Vinted.</p>
+            <p>Ma Wishlist LEGO & MOCs — Synchronisation Supabase & API Rebrickable.</p>
+            <p>Comparateurs : Avenue de la Brique, Brickmitri.com, Planet-Brick, Dealabs, Leboncoin, Vinted & Beebs.</p>
         </div>
     </footer>
 
@@ -558,7 +558,7 @@
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-bold uppercase text-slate-700 flex items-center gap-1.5">
                                 <i data-lucide="shopping-bag" class="w-4 h-4 text-lego-blue"></i>
-                                Liens d'achat personnalisés (Leboncoin, Vinted, Dealabs, Amazon...)
+                                Liens d'achat personnalisés (Leboncoin, Vinted, Beebs, Dealabs...)
                             </label>
                             <button type="button" onclick="addCustomLinkRow()" class="text-xs font-semibold bg-white hover:bg-slate-100 text-lego-blue border border-slate-300 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Ajouter un lien
@@ -590,7 +590,7 @@
         </div>
     </div>
 
-    <!-- 1B. MODALE AJOUT / ÉDITION D'UN MOC -->
+    <!-- 1B. MODALE AJOUT / ÉDITION D'UN MOC (IMPORT AUTO REBRICKABLE + SETS REQUIS) -->
     <div id="moc-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden my-auto">
             <div class="bg-purple-700 text-white px-6 py-4 flex items-center justify-between">
@@ -604,18 +604,22 @@
             </div>
 
             <div class="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
-                <!-- RECHERCHE / IMPORT MOC REBRICKABLE -->
-                <div class="bg-purple-50 border border-purple-200 rounded-xl p-3.5 space-y-2">
+                <!-- RECHERCHE / IMPORT AUTO MOC REBRICKABLE -->
+                <div class="bg-purple-50 border border-purple-200 rounded-xl p-3.5 space-y-2.5">
                     <label class="block text-xs font-bold uppercase text-purple-900 flex items-center justify-between">
-                        <span>Importer depuis Rebrickable (N° MOC ou URL)</span>
-                        <span id="moc-rb-status" class="text-[11px] font-normal text-purple-700">ex: MOC-123456</span>
+                        <span class="flex items-center gap-1.5">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            Recherche ou Import auto MOC Rebrickable
+                        </span>
+                        <span id="moc-rb-status" class="text-[11px] font-normal text-purple-700">Auto-import sets requis</span>
                     </label>
                     <div class="flex gap-2">
-                        <input type="text" id="moc-rb-input" onkeydown="if(event.key==='Enter'){event.preventDefault(); fetchMocFromRebrickable();}" placeholder="Ex: MOC-148520 ou https://rebrickable.com/mocs/MOC-148520/..." class="flex-1 px-3 py-2 bg-white border border-purple-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
-                        <button type="button" onclick="fetchMocFromRebrickable()" class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl text-xs sm:text-sm transition shrink-0">
-                            Charger MOC
+                        <input type="text" id="moc-rb-input" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchOrImportMocRebrickable();}" placeholder="Ex: MOC-148520, URL Rebrickable ou mot-clé (ex: Arkham)..." class="flex-1 px-3 py-2 bg-white border border-purple-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                        <button type="button" onclick="searchOrImportMocRebrickable()" class="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl text-xs sm:text-sm transition shrink-0">
+                            Importer
                         </button>
                     </div>
+                    <div id="moc-rb-results" class="hidden max-h-56 overflow-y-auto divide-y divide-slate-100 bg-white rounded-xl border border-purple-200 shadow-inner"></div>
                 </div>
 
                 <form id="moc-form" onsubmit="saveMoc(event)" class="space-y-4">
@@ -624,22 +628,22 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">N° MOC *</label>
-                            <input type="text" id="moc-number" required placeholder="ex: MOC-148520" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                            <input type="text" id="moc-number" required placeholder="ex: MOC-148520" oninput="handleMocNumberInput()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-mono font-bold focus:ring-2 focus:ring-purple-600 focus:outline-none">
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nom du MOC *</label>
-                            <input type="text" id="moc-name" required placeholder="ex: Modular Arkham Asylum Expansion" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                            <input type="text" id="moc-name" required placeholder="Rempli automatiquement depuis Rebrickable" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Créateur / Designer</label>
-                            <input type="text" id="moc-designer" placeholder="ex: BrickArtisan" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                            <input type="text" id="moc-designer" placeholder="Auto-rempli" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nombre de pièces</label>
-                            <input type="number" id="moc-parts" min="0" placeholder="ex: 2450" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
+                            <input type="number" id="moc-parts" min="0" placeholder="Auto-rempli" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-600 focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Prix notice (€)</label>
@@ -647,22 +651,27 @@
                         </div>
                     </div>
 
-                    <!-- LISTE DES SETS QUI COMPOSENT LE MOC -->
+                    <!-- LISTE DES SETS QUI COMPOSENT LE MOC (AUTO-REMPLIE PAR REBRICKABLE) -->
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-3">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between gap-2">
                             <label class="text-xs font-bold uppercase text-slate-700 flex items-center gap-1.5">
                                 <i data-lucide="boxes" class="w-4 h-4 text-purple-600"></i>
-                                Sets LEGO qui composent ce MOC
+                                Sets LEGO requis (Alternate Build)
                             </label>
-                            <button type="button" onclick="addMocRequiredSetRow()" class="text-xs font-semibold bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
-                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Ajouter un set
-                            </button>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="refreshMocAlternatesFromApi()" class="text-xs font-semibold bg-purple-100 hover:bg-purple-200 text-purple-800 px-2.5 py-1 rounded-lg transition flex items-center gap-1" title="Recharger les sets requis depuis Rebrickable">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3"></i> Auto-détecter
+                                </button>
+                                <button type="button" onclick="addMocRequiredSetRow()" class="text-xs font-semibold bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Ajouter
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Ajout rapide depuis la wishlist existante -->
                         <div class="flex gap-2">
                             <select id="moc-wishlist-picker" class="flex-1 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-purple-600 focus:outline-none">
-                                <option value="">-- Choisir un set déjà dans ma wishlist --</option>
+                                <option value="">-- Ou choisir un set déjà dans ma wishlist --</option>
                             </select>
                             <button type="button" onclick="addSelectedWishlistSetToMoc()" class="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-900 font-semibold rounded-lg text-xs shrink-0 transition">
                                 Ajouter
@@ -781,7 +790,7 @@
         </div>
     </div>
 
-    <!-- 4. MODALE COMPARATEUR RAPIDE (AVEC DEALABS, LEBONCOIN & VINTED) -->
+    <!-- 4. MODALE COMPARATEUR RAPIDE (AVEC DEALABS, LEBONCOIN, VINTED & BEEBS) -->
     <div id="comparator-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden my-auto">
             <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
@@ -859,6 +868,17 @@
                         </div>
                         <i data-lucide="external-link" class="w-4 h-4 text-teal-800 shrink-0"></i>
                     </a>
+                    <!-- CASE BEEBS -->
+                    <a id="qcomp-beebs" href="https://www.beebs.app/fr/recherche?q=lego" target="_blank" rel="noopener" class="flex items-center justify-between p-3 rounded-xl border border-fuchsia-300 bg-fuchsia-50/80 hover:bg-fuchsia-100 transition">
+                        <div class="flex items-center gap-2.5">
+                            <img src="https://www.google.com/s2/favicons?domain=beebs.app&sz=32" alt="" class="w-5 h-5 rounded-sm shrink-0">
+                            <div>
+                                <p class="font-bold text-sm text-fuchsia-950">Beebs</p>
+                                <p class="text-xs text-fuchsia-800">N'oubliez pas de regarder aussi sur Beebs</p>
+                            </div>
+                        </div>
+                        <i data-lucide="external-link" class="w-4 h-4 text-fuchsia-800 shrink-0"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -924,7 +944,8 @@
         let cloudReady = false;
         let rbThemesCache = null;
         let numberLookupTimer = null;
-        let activePage = 'sets'; // 'sets' | 'mocs'
+        let mocLookupTimer = null;
+        let activePage = 'sets';
 
         let appState = {
             title: 'Ma Wishlist LEGO',
@@ -956,6 +977,33 @@
                 reservedBy: ''
             }
         ];
+
+        // =========================================================================
+        // HELPER REQUÊTES API REBRICKABLE (DIRECT + FALLBACK PROXY SI CORS)
+        // =========================================================================
+        async function fetchRebrickableJson(endpointPath) {
+            const targetUrl = `https://rebrickable.com/api/v3/lego/${endpointPath.replace(/^\/+/, '')}`;
+            try {
+                const res = await fetch(targetUrl, {
+                    headers: {
+                        'Authorization': `key ${REBRICKABLE_API_KEY}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                if (res.ok) return await res.json();
+                if (res.status === 404) return null;
+            } catch (_) {
+                // Fallback proxy CORS si bloqué par le navigateur sur certains endpoints /mocs/
+            }
+            const sep = targetUrl.includes('?') ? '&' : '?';
+            const proxiedUrl = `https://corsproxy.io/?${encodeURIComponent(`${targetUrl}${sep}key=${REBRICKABLE_API_KEY}`)}`;
+            const proxyRes = await fetch(proxiedUrl, { headers: { 'Accept': 'application/json' } });
+            if (!proxyRes.ok) {
+                if (proxyRes.status === 404) return null;
+                throw new Error(`Erreur API Rebrickable (${proxyRes.status})`);
+            }
+            return await proxyRes.json();
+        }
 
         // =========================================================================
         // NAVIGATION ENTRE LES ONGLETS (WISHLIST SETS vs PAGE MOCs)
@@ -1027,7 +1075,6 @@
 
         function formatEnglishDateToFrench(rawDateStr) {
             const cleaned = rawDateStr.replace(/[()]/g, '').trim();
-            // Format "Sept. 9, 2025" ou "July 31, 2027"
             const match = cleaned.match(/^([A-Za-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})$/);
             if (match) {
                 const mKey = match[1].toLowerCase();
@@ -1041,7 +1088,6 @@
 
         function parseRebrickableDateRange(text) {
             if (!text) return;
-            // Ex: "(Sept. 9, 2025 to July 31, 2027)" ou "Sept. 9, 2025 to July 31, 2027"
             const rangeMatch = text.match(/([A-Za-z]+\.?\s+\d{1,2},?\s+\d{4})\s*(?:to|-|–|au)\s*([A-Za-z]+\.?\s+\d{1,2},?\s+\d{4})/i);
             if (rangeMatch) {
                 const frStart = formatEnglishDateToFrench(rangeMatch[1]);
@@ -1051,7 +1097,6 @@
                 showToast(`Dates extraites : sortie ${frStart} / retrait ${frEnd}`, 'success');
                 return;
             }
-            // Sinon si une seule date
             const singleMatch = text.match(/([A-Za-z]+\.?\s+\d{1,2},?\s+\d{4})/);
             if (singleMatch) {
                 const frSingle = formatEnglishDateToFrench(singleMatch[1]);
@@ -1109,16 +1154,13 @@
         }
 
         // =========================================================================
-        // REBRICKABLE API (AUTO-COMPLÉTION AU NUMÉRO, RECHERCHE & MOCs)
+        // REBRICKABLE API (SETS)
         // =========================================================================
         async function loadRebrickableThemes() {
             if (rbThemesCache) return rbThemesCache;
             try {
-                const res = await fetch(`https://rebrickable.com/api/v3/lego/themes/?page_size=1000`, {
-                    headers: { 'Authorization': `key ${REBRICKABLE_API_KEY}` }
-                });
-                if (!res.ok) return {};
-                const data = await res.json();
+                const data = await fetchRebrickableJson('themes/?page_size=1000');
+                if (!data) return {};
                 rbThemesCache = {};
                 (data.results || []).forEach(t => { rbThemesCache[t.id] = t.name; });
                 return rbThemesCache;
@@ -1164,14 +1206,11 @@
             statusEl.textContent = `Recherche auto #${setNum}...`;
             try {
                 const themesMap = await loadRebrickableThemes();
-                const res = await fetch(`https://rebrickable.com/api/v3/lego/sets/${encodeURIComponent(setNum)}-1/`, {
-                    headers: { 'Authorization': `key ${REBRICKABLE_API_KEY}` }
-                });
-                if (!res.ok) {
+                const data = await fetchRebrickableJson(`sets/${encodeURIComponent(setNum)}-1/`);
+                if (!data) {
                     statusEl.textContent = 'Set non trouvé sur Rebrickable';
                     return;
                 }
-                const data = await res.json();
                 const cleanNum = String(data.set_num).replace(/-1$/, '');
                 const rbTheme = themesMap[data.theme_id] || 'LEGO';
 
@@ -1197,7 +1236,7 @@
 
                 updateLiveComparatorLinks();
                 statusEl.textContent = `✓ Infos #${cleanNum} chargées (${data.year})`;
-                showToast(`Infos #${cleanNum} chargées ! Clique sur "Voir sur Rebrickable" pour copier les dates exactes si besoin.`, 'success');
+                showToast(`Infos #${cleanNum} chargées !`, 'success');
             } catch (err) {
                 statusEl.textContent = 'Erreur Rebrickable';
             }
@@ -1219,14 +1258,8 @@
 
             try {
                 const themesMap = await loadRebrickableThemes();
-                const url = `https://rebrickable.com/api/v3/lego/sets/?search=${encodeURIComponent(query)}&page_size=12`;
-                const response = await fetch(url, {
-                    headers: { 'Authorization': `key ${REBRICKABLE_API_KEY}` }
-                });
-
-                if (!response.ok) throw new Error(`Erreur API (${response.status})`);
-                const data = await response.json();
-                const sets = data.results || [];
+                const data = await fetchRebrickableJson(`sets/?search=${encodeURIComponent(query)}&page_size=12`);
+                const sets = data?.results || [];
 
                 if (sets.length === 0) {
                     statusEl.textContent = '0 résultat';
@@ -1363,7 +1396,7 @@
         }
 
         // =========================================================================
-        // LIENS COMPARATEURS DE PRIX, DEALABS, LEBONCOIN, VINTED & FAVICON
+        // LIENS COMPARATEURS DE PRIX, DEALABS, LEBONCOIN, VINTED, BEEBS & FAVICON
         // =========================================================================
         function slugifyLegoName(text) {
             return String(text || '')
@@ -1394,6 +1427,9 @@
             const vintedUrl = cleanNum
                 ? `https://www.vinted.fr/catalog?search_text=${encodeURIComponent('lego ' + cleanNum)}`
                 : `https://www.vinted.fr/catalog?search_text=lego`;
+            const beebsUrl = cleanNum
+                ? `https://www.beebs.app/fr/recherche?q=${encodeURIComponent('lego ' + cleanNum)}`
+                : `https://www.beebs.app/fr/recherche?q=lego`;
             const rebrickableUrl = /^\d+$/.test(cleanNum)
                 ? `https://rebrickable.com/sets/${cleanNum}-1/`
                 : `https://rebrickable.com/search/?q=${encodedNum}`;
@@ -1405,6 +1441,7 @@
                 dealabs: dealabsUrl,
                 leboncoin: leboncoinUrl,
                 vinted: vintedUrl,
+                beebs: beebsUrl,
                 rebrickable: rebrickableUrl
             };
         }
@@ -1451,7 +1488,8 @@
                 planet: 'https://planet-brick.com',
                 dealabs: 'https://www.dealabs.com/search?q=lego',
                 leboncoin: 'https://www.leboncoin.fr/recherche?text=lego',
-                vinted: 'https://www.vinted.fr/catalog?search_text=lego'
+                vinted: 'https://www.vinted.fr/catalog?search_text=lego',
+                beebs: 'https://www.beebs.app/fr/recherche?q=lego'
             };
             document.getElementById('qcomp-adlb').href = urls.avenue;
             document.getElementById('qcomp-bm').href = urls.brickmitri;
@@ -1459,6 +1497,7 @@
             document.getElementById('qcomp-dealabs').href = urls.dealabs;
             document.getElementById('qcomp-lbc').href = urls.leboncoin;
             document.getElementById('qcomp-vinted').href = urls.vinted;
+            document.getElementById('qcomp-beebs').href = urls.beebs;
         }
 
         // =========================================================================
@@ -1469,7 +1508,7 @@
             const row = document.createElement('div');
             row.className = 'custom-link-row flex items-center gap-2';
             row.innerHTML = `
-                <input type="text" placeholder="Nom (ex: Leboncoin)" value="${escapeHTML(label)}" class="custom-link-label w-1/3 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lego-blue focus:outline-none">
+                <input type="text" placeholder="Nom (ex: Beebs)" value="${escapeHTML(label)}" class="custom-link-label w-1/3 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lego-blue focus:outline-none">
                 <input type="url" placeholder="https://..." value="${escapeHTML(url)}" class="custom-link-url flex-1 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lego-blue focus:outline-none">
                 <button type="button" onclick="this.parentElement.remove()" title="Supprimer ce lien" class="p-1.5 text-slate-400 hover:text-lego-red hover:bg-red-50 rounded-lg transition">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -1497,50 +1536,163 @@
         }
 
         // =========================================================================
-        // GESTION DE LA PAGE MOCs (CRUD, REBRICKABLE & LISTE DES SETS REQUIS)
+        // GESTION DE LA PAGE MOCs (RECHERCHE, IMPORT AUTO REBRICKABLE & SETS REQUIS)
         // =========================================================================
-        async function fetchMocFromRebrickable() {
+        function handleMocNumberInput() {
+            clearTimeout(mocLookupTimer);
+            const raw = document.getElementById('moc-number').value.trim().toUpperCase();
+            if (/^MOC-\d{4,}$/.test(raw)) {
+                mocLookupTimer = setTimeout(() => importSpecificMocByCode(raw), 600);
+            }
+        }
+
+        async function searchOrImportMocRebrickable() {
             const raw = document.getElementById('moc-rb-input').value.trim();
             const statusEl = document.getElementById('moc-rb-status');
-            if (!raw) {
-                showToast('Entre un numéro MOC-xxxxx ou une URL Rebrickable.', 'info');
-                return;
-            }
-            const mocMatch = raw.match(/(MOC-\d+)/i) || raw.match(/^(\d+)$/);
-            if (!mocMatch) {
-                showToast('Format MOC invalide (ex: MOC-148520).', 'error');
-                return;
-            }
-            const mocNum = mocMatch[1].toUpperCase().startsWith('MOC-')
-                ? mocMatch[1].toUpperCase()
-                : `MOC-${mocMatch[1]}`;
+            const resultsBox = document.getElementById('moc-rb-results');
 
-            statusEl.textContent = `Chargement ${mocNum}...`;
+            if (!raw) {
+                showToast('Entre un numéro MOC-xxxxx, une URL ou un mot-clé.', 'info');
+                return;
+            }
+
+            // Si c'est un numéro MOC direct (ex: MOC-148520 ou URL contenant MOC-148520)
+            const directMocMatch = raw.match(/(MOC-\d+)/i) || raw.match(/^(\d{4,})$/);
+            if (directMocMatch) {
+                const mocCode = directMocMatch[1].toUpperCase().startsWith('MOC-')
+                    ? directMocMatch[1].toUpperCase()
+                    : `MOC-${directMocMatch[1]}`;
+                resultsBox.classList.add('hidden');
+                await importSpecificMocByCode(mocCode);
+                return;
+            }
+
+            // Sinon recherche par mot-clé sur /api/v3/lego/mocs/?search=...
+            statusEl.textContent = 'Recherche MOCs...';
+            resultsBox.classList.remove('hidden');
+            resultsBox.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Recherche sur Rebrickable...</div>`;
+
             try {
-                const res = await fetch(`https://rebrickable.com/api/v3/lego/mocs/${encodeURIComponent(mocNum)}/`, {
-                    headers: { 'Authorization': `key ${REBRICKABLE_API_KEY}` }
-                });
-                if (!res.ok) {
-                    statusEl.textContent = 'MOC introuvable via API';
-                    document.getElementById('moc-number').value = mocNum;
-                    document.getElementById('moc-url').value = `https://rebrickable.com/mocs/${mocNum}/`;
-                    showToast(`${mocNum} pré-rempli (complète le nom manuellement).`, 'info');
+                const data = await fetchRebrickableJson(`mocs/?search=${encodeURIComponent(raw)}&page_size=12`);
+                const mocs = data?.results || [];
+                if (mocs.length === 0) {
+                    statusEl.textContent = '0 MOC trouvé';
+                    resultsBox.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Aucun MOC trouvé pour "${escapeHTML(raw)}".</div>`;
                     return;
                 }
-                const data = await res.json();
-                document.getElementById('moc-number').value = data.set_num || mocNum;
-                document.getElementById('moc-name').value = data.name || '';
-                document.getElementById('moc-designer').value = data.designer_name || '';
-                document.getElementById('moc-parts').value = data.num_parts || '';
-                document.getElementById('moc-url').value = data.moc_url || `https://rebrickable.com/mocs/${mocNum}/`;
-                if (data.moc_img_url) document.getElementById('moc-image').value = data.moc_img_url;
 
-                statusEl.textContent = `✓ ${mocNum} importé`;
-                showToast(`MOC ${mocNum} importé depuis Rebrickable !`, 'success');
+                statusEl.textContent = `${mocs.length} MOC(s)`;
+                resultsBox.innerHTML = mocs.map(m => `
+                    <button type="button" onclick="selectRebrickableMocFromSearch('${escapeHTML(m.set_num)}')" class="w-full text-left p-2.5 hover:bg-purple-50 transition flex items-center gap-3">
+                        <img src="${escapeHTML(m.moc_img_url || '')}" onerror="this.style.display='none'" class="w-12 h-12 object-contain bg-white rounded-lg border border-slate-200 p-1 shrink-0">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-mono text-xs font-bold bg-purple-800 text-white px-1.5 py-0.5 rounded">${escapeHTML(m.set_num)}</span>
+                                <span class="text-[11px] font-semibold text-purple-700 truncate">par ${escapeHTML(m.designer_name || 'Inconnu')}</span>
+                            </div>
+                            <p class="text-xs font-bold text-slate-800 truncate mt-0.5">${escapeHTML(m.name)}</p>
+                            <p class="text-[11px] text-slate-500">${m.num_parts || 0} pièces</p>
+                        </div>
+                        <span class="text-xs font-semibold text-purple-700 shrink-0">Importer →</span>
+                    </button>
+                `).join('');
             } catch (err) {
-                statusEl.textContent = 'Erreur Rebrickable';
-                showToast('Impossible de contacter Rebrickable pour ce MOC.', 'error');
+                statusEl.textContent = 'Erreur';
+                resultsBox.innerHTML = `<div class="p-3 text-center text-xs text-red-600">Erreur Rebrickable : ${escapeHTML(err.message)}</div>`;
             }
+        }
+
+        async function selectRebrickableMocFromSearch(mocCode) {
+            document.getElementById('moc-rb-results').classList.add('hidden');
+            await importSpecificMocByCode(mocCode);
+        }
+
+        async function importSpecificMocByCode(mocCode) {
+            const statusEl = document.getElementById('moc-rb-status');
+            statusEl.textContent = `Import ${mocCode} + sets requis...`;
+
+            try {
+                // Appel parallèle : détails du MOC + liste des sets requis (alternates)
+                const [mocData, alternatesData] = await Promise.all([
+                    fetchRebrickableJson(`mocs/${encodeURIComponent(mocCode)}/`),
+                    fetchRebrickableJson(`mocs/${encodeURIComponent(mocCode)}/alternates/`).catch(() => null)
+                ]);
+
+                if (!mocData) {
+                    statusEl.textContent = `${mocCode} introuvable`;
+                    document.getElementById('moc-number').value = mocCode;
+                    document.getElementById('moc-url').value = `https://rebrickable.com/mocs/${mocCode}/`;
+                    showToast(`${mocCode} introuvable sur l'API Rebrickable.`, 'error');
+                    return;
+                }
+
+                document.getElementById('moc-number').value = mocData.set_num || mocCode;
+                document.getElementById('moc-name').value = mocData.name || '';
+                document.getElementById('moc-designer').value = mocData.designer_name || '';
+                document.getElementById('moc-parts').value = mocData.num_parts || '';
+                document.getElementById('moc-url').value = mocData.moc_url || `https://rebrickable.com/mocs/${mocCode}/`;
+                if (mocData.moc_img_url) {
+                    document.getElementById('moc-image').value = mocData.moc_img_url;
+                }
+
+                // Remplir automatiquement la liste des sets requis depuis /alternates/
+                const altSets = alternatesData?.results || [];
+                const container = document.getElementById('moc-required-sets-container');
+                container.innerHTML = '';
+
+                if (altSets.length > 0) {
+                    altSets.forEach(alt => {
+                        const cleanNum = String(alt.set_num).replace(/-1$/, '');
+                        const inWishlist = appState.sets.find(s => String(s.number) === cleanNum);
+                        const price = inWishlist?.price ?? '';
+                        addMocRequiredSetRow(cleanNum, alt.name || '', 1, price);
+                    });
+                    statusEl.textContent = `✓ ${mocCode} + ${altSets.length} set(s) importés`;
+                    showToast(`${mocCode} et ${altSets.length} set(s) requis importés automatiquement !`, 'success');
+                } else {
+                    addMocRequiredSetRow();
+                    statusEl.textContent = `✓ ${mocCode} importé (MOC custom sans set de base)`;
+                    showToast(`${mocCode} importé ! (Ce MOC n'est pas lié à une boîte unique sur Rebrickable).`, 'info');
+                }
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = 'Erreur import MOC';
+                showToast('Erreur lors de la récupération du MOC : ' + (err.message || err), 'error');
+            }
+        }
+
+        async function refreshMocAlternatesFromApi() {
+            const rawCode = document.getElementById('moc-number').value.trim().toUpperCase();
+            if (!rawCode) {
+                showToast('Saisis d’abord un numéro MOC (ex: MOC-148520).', 'info');
+                return;
+            }
+            const mocCode = rawCode.startsWith('MOC-') ? rawCode : `MOC-${rawCode}`;
+            await importSpecificMocByCode(mocCode);
+        }
+
+        async function autoFillMocReqRowBySetNumber(inputEl) {
+            const rawNum = inputEl.value.trim();
+            if (!/^\d{4,6}$/.test(rawNum)) return;
+            const row = inputEl.closest('.moc-req-row');
+            const nameInput = row.querySelector('.moc-req-name');
+            const priceInput = row.querySelector('.moc-req-price');
+
+            // Vérifier d'abord dans la wishlist locale
+            const inWishlist = appState.sets.find(s => String(s.number) === rawNum);
+            if (inWishlist) {
+                if (!nameInput.value.trim()) nameInput.value = inWishlist.name;
+                if (!priceInput.value && inWishlist.price != null) priceInput.value = inWishlist.price;
+                return;
+            }
+
+            // Sinon interroger Rebrickable
+            try {
+                const data = await fetchRebrickableJson(`sets/${encodeURIComponent(rawNum)}-1/`);
+                if (data && !nameInput.value.trim()) {
+                    nameInput.value = data.name;
+                }
+            } catch (_) {}
         }
 
         function addMocRequiredSetRow(setNum = '', setName = '', qty = 1, price = '') {
@@ -1549,7 +1701,7 @@
             row.className = 'moc-req-row grid grid-cols-12 gap-1.5 items-center';
             row.innerHTML = `
                 <input type="number" min="1" value="${qty || 1}" title="Quantité" class="moc-req-qty col-span-2 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center">
-                <input type="text" placeholder="N° set" value="${escapeHTML(setNum)}" class="moc-req-num col-span-3 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold">
+                <input type="text" placeholder="N° set" value="${escapeHTML(setNum)}" onblur="autoFillMocReqRowBySetNumber(this)" class="moc-req-num col-span-3 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold">
                 <input type="text" placeholder="Nom du set" value="${escapeHTML(setName)}" class="moc-req-name col-span-4 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs">
                 <input type="number" step="0.01" min="0" placeholder="Prix €" value="${price !== '' && price != null ? price : ''}" class="moc-req-price col-span-2 px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs">
                 <button type="button" onclick="this.parentElement.remove()" class="col-span-1 p-1.5 text-slate-400 hover:text-lego-red rounded-lg flex justify-center">
@@ -1591,12 +1743,12 @@
             form.reset();
             document.getElementById('moc-id').value = '';
             document.getElementById('moc-rb-input').value = '';
-            document.getElementById('moc-rb-status').textContent = 'ex: MOC-123456';
+            document.getElementById('moc-rb-results').classList.add('hidden');
+            document.getElementById('moc-rb-status').textContent = 'Auto-import sets requis';
             document.getElementById('moc-required-sets-container').innerHTML = '';
 
-            // Peupler le sélecteur des sets de la wishlist
             const picker = document.getElementById('moc-wishlist-picker');
-            picker.innerHTML = `<option value="">-- Choisir un set déjà dans ma wishlist --</option>` +
+            picker.innerHTML = `<option value="">-- Ou choisir un set déjà dans ma wishlist --</option>` +
                 appState.sets.filter(s => !s.isBundle).map(s =>
                     `<option value="${escapeHTML(s.id)}">#${escapeHTML(s.number)} - ${escapeHTML(s.name)} ${s.price ? '(' + s.price + ' €)' : ''}</option>`
                 ).join('');
@@ -1737,7 +1889,6 @@
             const emptyState = document.getElementById('mocs-empty-state');
             updateNavCounts();
 
-            // Statistiques MOCs
             const totalMocs = appState.mocs.length;
             let totalReqSets = 0;
             let totalMocsBudget = 0;
@@ -1844,7 +1995,7 @@
                                     </p>
                                     ${reqs.length > 0
                                         ? `<ul class="divide-y divide-purple-100">${reqListHTML}</ul>`
-                                        : `<p class="text-xs text-slate-400 italic">Aucun set associé pour le moment.</p>`
+                                        : `<p class="text-xs text-slate-400 italic">Aucun set de base requis (pièces libres).</p>`
                                     }
                                 </div>
 
@@ -2158,9 +2309,6 @@
                 return true;
             });
 
-            // Tri :
-            // 1. Toujours "Bientôt retiré" en tête de liste
-            // 2. Ensuite selon le mode choisi (par défaut : Priorité Coup de cœur -> Moyenne -> Idée bonus, PUIS prix croissant)
             const priorityWeight = { high: 3, medium: 2, low: 1 };
             filtered.sort((a, b) => {
                 const aSoon = a.retiringSoon ? 1 : 0;
@@ -2251,7 +2399,6 @@
             const canCancelReservation = Boolean(isReserved && set.reservationOwnerId && set.reservationOwnerId === currentUserId);
             const priceFormatted = set.price ? `${parseFloat(set.price).toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €` : 'Prix non défini';
 
-            // Bloc dates sortie / retrait sous le titre
             const datesParts = [];
             if (set.releaseDate) datesParts.push(`<span>📅 Sortie : <strong>${escapeHTML(set.releaseDate)}</strong></span>`);
             if (set.retireDate) datesParts.push(`<span>⏳ Retrait : <strong>${escapeHTML(set.retireDate)}</strong></span>`);
@@ -2259,7 +2406,6 @@
                 ? `<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 mt-1 mb-1.5">${datesParts.join('')}</div>`
                 : '';
 
-            // Contenu du lot si isBundle
             const bundleItems = Array.isArray(set.bundleItems) ? set.bundleItems : [];
             const bundleHTML = (set.isBundle && bundleItems.length > 0)
                 ? `
@@ -2272,7 +2418,6 @@
                 `
                 : '';
 
-            // Liens personnalisés d'achat avec favicon
             const customLinks = Array.isArray(set.customLinks) ? set.customLinks : [];
             const customLinksHTML = customLinks.length > 0
                 ? `
@@ -2393,7 +2538,7 @@
                                 <div>
                                     <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center justify-between">
                                         <span>Comparer les prix :</span>
-                                        <button onclick="openComparatorHelper('${escapeHTML(set.number)}', '${escapeHTML(set.name).replace(/'/g, "\\'")}')" class="text-lego-blue hover:underline lowercase font-medium">+ Dealabs / LBC / Vinted</button>
+                                        <button onclick="openComparatorHelper('${escapeHTML(set.number)}', '${escapeHTML(set.name).replace(/'/g, "\\'")}')" class="text-lego-blue hover:underline lowercase font-medium">+ Dealabs / LBC / Vinted / Beebs</button>
                                     </p>
                                     <div class="grid grid-cols-3 gap-1.5">
                                         <a href="${urls.avenue}" target="_blank" rel="noopener noreferrer" class="text-center py-1.5 px-1 bg-amber-100/80 hover:bg-amber-200 text-amber-950 font-semibold rounded-lg text-[11px] transition truncate" title="Rechercher sur Avenue de la Brique">
